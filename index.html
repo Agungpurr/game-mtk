@@ -8,6 +8,10 @@
       href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Cinzel:wght@700;900&family=Rajdhani:wght@400;600;700&display=swap"
       rel="stylesheet"
     />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚔️</text></svg>"
+    />
 
     <style>
       * {
@@ -882,6 +886,81 @@
           font-size: 6px !important;
           bottom: 5px !important;
           white-space: nowrap;
+        }
+      }
+
+      /* Additional mobile optimizations */
+      @media (max-width: 768px) and (orientation: landscape) {
+        /* Make buttons bigger for touch */
+        .abtn {
+          min-height: 50px;
+          min-width: 50px;
+          font-size: 18px !important;
+        }
+
+        .mbtn,
+        .trans-btn,
+        .help-back {
+          min-height: 48px;
+          padding: 12px 24px !important;
+        }
+
+        /* Adjust map info position */
+        #map-info {
+          bottom: 20px !important;
+          font-size: 8px !important;
+          white-space: nowrap;
+          background: rgba(0, 0, 0, 0.7);
+        }
+
+        /* Adjust battle UI for touch */
+        .q-txt {
+          font-size: 16px !important;
+        }
+
+        .battle-bottom {
+          padding-bottom: 20px !important;
+        }
+
+        /* Make sure analog doesn't cover important UI */
+        #analog-stick {
+          bottom: 70px;
+          left: 70px;
+          width: 100px;
+          height: 100px;
+        }
+
+        /* Add touch feedback */
+        .abtn:active,
+        .mbtn:active,
+        .trans-btn:active,
+        .ulti-fire:active {
+          transform: scale(0.95);
+          transition: transform 0.05s;
+        }
+      }
+
+      /* Hide analog stick by default */
+      #analog-stick {
+        display: none !important;
+      }
+
+      /* Only show analog stick on map screen for mobile landscape */
+      @media (max-width: 768px) and (orientation: landscape) {
+        body.map-active #analog-stick {
+          display: block !important;
+        }
+      }
+
+      /* Hide mobile hint by default */
+      .mobile-controls-hint {
+        display: none !important;
+      }
+
+      /* Only show hint on map screen for mobile landscape */
+      @media (max-width: 768px) and (orientation: landscape) {
+        body.map-active .mobile-controls-hint {
+          display: block !important;
         }
       }
     </style>
@@ -3185,7 +3264,7 @@
         },
       };
 
-      // ========== MOBILE ORIENTATION DETECTION ==========
+      // ========== MOBILE ORIENTATION DETECTION (UPDATED) ==========
       (function () {
         // Create rotate warning element
         const rotateDiv = document.createElement("div");
@@ -3211,6 +3290,7 @@
             // Resize canvas after orientation change
             setTimeout(() => {
               resize();
+              updateAnalogVisibility();
               if (window.mapLoop) {
                 // Refresh map if active
                 const c = document.getElementById("map-canvas");
@@ -3226,6 +3306,7 @@
               }
             }, 100);
           }
+          updateAnalogVisibility();
         }
 
         // Check on load
@@ -3239,7 +3320,395 @@
           setTimeout(checkOrientation, 50);
         });
       })();
+      // ========== UPDATE BODY CLASS FOR MAP SCREEN ==========
+      // Modifikasi fungsi show untuk menambahkan class ke body
+      const originalShow = show;
+      show = function (id) {
+        originalShow(id);
 
+        // Update body class based on active screen
+        if (id === "s-map") {
+          document.body.classList.add("map-active");
+        } else {
+          document.body.classList.remove("map-active");
+        }
+
+        // Also update analog stick visibility based on screen
+        const analogStick = document.getElementById("analog-stick");
+        if (analogStick) {
+          if (
+            id === "s-map" &&
+            window.innerWidth <= 768 &&
+            window.innerHeight < window.innerWidth
+          ) {
+            analogStick.style.display = "block";
+          } else {
+            analogStick.style.display = "none";
+          }
+        }
+
+        const hintDiv = document.querySelector(".mobile-controls-hint");
+        if (hintDiv) {
+          if (
+            id === "s-map" &&
+            window.innerWidth <= 768 &&
+            window.innerHeight < window.innerWidth
+          ) {
+            hintDiv.style.display = "block";
+          } else {
+            hintDiv.style.display = "none";
+          }
+        }
+      };
+
+      // Modifikasi fungsi checkOrientation untuk update analog visibility
+      const originalCheckOrientation = window.checkOrientation;
+      function updateAnalogVisibility() {
+        const analogStick = document.getElementById("analog-stick");
+        const hintDiv = document.querySelector(".mobile-controls-hint");
+        const isMapActive = S.screen === "s-map";
+        const isMobileLandscape =
+          window.innerWidth <= 768 && window.innerHeight < window.innerWidth;
+
+        if (analogStick) {
+          analogStick.style.display =
+            isMapActive && isMobileLandscape ? "block" : "none";
+        }
+        if (hintDiv) {
+          hintDiv.style.display =
+            isMapActive && isMobileLandscape ? "block" : "none";
+        }
+      }
+
+      // Update orientation check function
+      function enhancedCheckOrientation() {
+        if (window.innerHeight > window.innerWidth) {
+          document.body.classList.add("portrait");
+          document.body.classList.remove("landscape");
+        } else {
+          document.body.classList.add("landscape");
+          document.body.classList.remove("portrait");
+
+          setTimeout(() => {
+            resize();
+            updateAnalogVisibility();
+            if (window.mapLoop) {
+              const c = document.getElementById("map-canvas");
+              if (c && c.width !== window.innerWidth) {
+                c.width = window.innerWidth;
+                c.height = window.innerHeight;
+              }
+              const bc = document.getElementById("battle-canvas");
+              if (bc && bc.width !== window.innerWidth) {
+                bc.width = window.innerWidth;
+                bc.height = window.innerHeight;
+              }
+            }
+          }, 100);
+        }
+        updateAnalogVisibility();
+      }
+
+      // Override the orientation check
+      window.enhancedCheckOrientation = enhancedCheckOrientation;
+
+      // ========== VIRTUAL ANALOG STICK FIXED ==========
+      (function () {
+        // Hapus yang sudah ada jika ada
+        const existingStick = document.getElementById("analog-stick");
+        if (existingStick) existingStick.remove();
+        const existingHint = document.querySelector(".mobile-controls-hint");
+        if (existingHint) existingHint.remove();
+
+        // Create analog stick container
+        const analogStick = document.createElement("div");
+        analogStick.id = "analog-stick";
+        analogStick.innerHTML = `
+    <div class="analog-base">
+      <div class="analog-thumb"></div>
+    </div>
+  `;
+        document.body.appendChild(analogStick);
+
+        // Add styles for analog stick
+        const analogStyles = document.createElement("style");
+        analogStyles.textContent = `
+    #analog-stick {
+      position: fixed;
+      bottom: 80px;
+      left: 80px;
+      width: 120px;
+      height: 120px;
+      z-index: 10000;
+      display: none;
+      touch-action: none;
+    }
+    
+    .analog-base {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      border: 2px solid #00ccff;
+      border-radius: 50%;
+      backdrop-filter: blur(4px);
+      box-shadow: 0 0 20px rgba(0, 204, 255, 0.3);
+    }
+    
+    .analog-thumb {
+      position: absolute;
+      width: 50px;
+      height: 50px;
+      background: #00ccff;
+      border-radius: 50%;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      transition: all 0.05s ease-out;
+      box-shadow: 0 0 15px #00ccff;
+      cursor: pointer;
+    }
+    
+    .mobile-controls-hint {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: rgba(0,0,0,0.7);
+      padding: 8px 12px;
+      border-radius: 20px;
+      font-size: 10px;
+      color: #00ccff;
+      font-family: monospace;
+      z-index: 10000;
+      display: none;
+      pointer-events: none;
+      border: 1px solid #00ccff44;
+    }
+    
+    @media (max-width: 768px) and (orientation: landscape) {
+      #analog-stick {
+        display: block !important;
+      }
+      .mobile-controls-hint {
+        display: block !important;
+      }
+    }
+    
+    /* Hide analog when not on map */
+    body:not(.map-active) #analog-stick {
+      display: none !important;
+    }
+    body:not(.map-active) .mobile-controls-hint {
+      display: none !important;
+    }
+  `;
+        document.head.appendChild(analogStyles);
+
+        // Add hint text
+        const hintDiv = document.createElement("div");
+        hintDiv.className = "mobile-controls-hint";
+        hintDiv.innerHTML = "🎮 Geser joystick untuk bergerak";
+        document.body.appendChild(hintDiv);
+
+        let active = false;
+        let baseX = 0,
+          baseY = 0;
+        let moveInterval = null;
+        let lastDirection = { dx: 0, dy: 0 };
+        let touchId = null;
+
+        const thumb = analogStick.querySelector(".analog-thumb");
+        const maxDist = 40;
+
+        function updateThumbPosition(clientX, clientY) {
+          const rect = analogStick.getBoundingClientRect();
+          if (!rect.width) return;
+
+          // Calculate position relative to center
+          let dx = clientX - (rect.left + rect.width / 2);
+          let dy = clientY - (rect.top + rect.height / 2);
+          const dist = Math.sqrt(dx * dx + dy * dy);
+
+          if (dist > maxDist) {
+            dx = (dx / dist) * maxDist;
+            dy = (dy / dist) * maxDist;
+          }
+
+          // Update thumb position
+          thumb.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`;
+
+          // Calculate direction (with deadzone)
+          let dirX = 0,
+            dirY = 0;
+          const deadzone = 12;
+          if (Math.abs(dx) > deadzone) dirX = dx > 0 ? 1 : -1;
+          if (Math.abs(dy) > deadzone) dirY = dy > 0 ? 1 : -1;
+
+          // Send movement if direction changed
+          if (lastDirection.dx !== dirX || lastDirection.dy !== dirY) {
+            lastDirection = { dx: dirX, dy: dirY };
+
+            // Stop current movement
+            if (moveInterval) {
+              clearInterval(moveInterval);
+              moveInterval = null;
+            }
+
+            // Start new movement if direction exists
+            if ((dirX !== 0 || dirY !== 0) && S.screen === "s-map") {
+              // Initial move
+              if (typeof Game !== "undefined" && Game.movePlayer) {
+                Game.movePlayer(dirX, dirY);
+              }
+              // Continuous move
+              moveInterval = setInterval(() => {
+                if (
+                  typeof Game !== "undefined" &&
+                  Game.movePlayer &&
+                  S.screen === "s-map"
+                ) {
+                  Game.movePlayer(dirX, dirY);
+                }
+              }, 150);
+            } else {
+              // Stop movement
+              if (typeof Game !== "undefined" && Game.stopMove) {
+                Game.stopMove();
+              }
+            }
+          }
+        }
+
+        function resetThumb() {
+          thumb.style.transform = "translate(-50%, -50%)";
+          active = false;
+          touchId = null;
+          lastDirection = { dx: 0, dy: 0 };
+          if (moveInterval) {
+            clearInterval(moveInterval);
+            moveInterval = null;
+          }
+          if (typeof Game !== "undefined" && Game.stopMove) {
+            Game.stopMove();
+          }
+        }
+
+        // Touch events with better handling
+        analogStick.addEventListener("touchstart", (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          if (S.screen !== "s-map") return;
+
+          const touch = e.touches[0];
+          if (!touch) return;
+
+          touchId = touch.identifier;
+          active = true;
+
+          // Get initial position
+          const rect = analogStick.getBoundingClientRect();
+          baseX = rect.left + rect.width / 2;
+          baseY = rect.top + rect.height / 2;
+
+          updateThumbPosition(touch.clientX, touch.clientY);
+        });
+
+        analogStick.addEventListener("touchmove", (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          if (!active || S.screen !== "s-map") return;
+
+          // Find the touch we're tracking
+          let touch = null;
+          for (let i = 0; i < e.touches.length; i++) {
+            if (e.touches[i].identifier === touchId) {
+              touch = e.touches[i];
+              break;
+            }
+          }
+          if (!touch) return;
+
+          updateThumbPosition(touch.clientX, touch.clientY);
+        });
+
+        analogStick.addEventListener("touchend", (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          resetThumb();
+        });
+
+        analogStick.addEventListener("touchcancel", (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          resetThumb();
+        });
+
+        // Mouse support for testing on desktop
+        let mouseActive = false;
+        let mouseMoveHandler = null;
+        let mouseUpHandler = null;
+
+        analogStick.addEventListener("mousedown", (e) => {
+          e.preventDefault();
+          if (S.screen !== "s-map") return;
+
+          mouseActive = true;
+          const rect = analogStick.getBoundingClientRect();
+          baseX = rect.left + rect.width / 2;
+          baseY = rect.top + rect.height / 2;
+
+          updateThumbPosition(e.clientX, e.clientY);
+
+          mouseMoveHandler = (moveEvent) => {
+            if (!mouseActive) return;
+            updateThumbPosition(moveEvent.clientX, moveEvent.clientY);
+          };
+
+          mouseUpHandler = () => {
+            mouseActive = false;
+            resetThumb();
+            document.removeEventListener("mousemove", mouseMoveHandler);
+            document.removeEventListener("mouseup", mouseUpHandler);
+          };
+
+          document.addEventListener("mousemove", mouseMoveHandler);
+          document.addEventListener("mouseup", mouseUpHandler);
+        });
+
+        // Update visibility when screen changes
+        function updateAnalogStickVisibility() {
+          const isMap = S.screen === "s-map";
+          const isMobileLandscape =
+            window.innerWidth <= 768 && window.innerHeight < window.innerWidth;
+
+          if (isMap && isMobileLandscape) {
+            analogStick.style.display = "block";
+            hintDiv.style.display = "block";
+          } else {
+            analogStick.style.display = "none";
+            hintDiv.style.display = "none";
+          }
+        }
+
+        // Override show function to update analog visibility
+        const originalShowFunction = window.show || show;
+        window.show = function (id) {
+          if (originalShowFunction) originalShowFunction(id);
+          S.screen = id;
+          setTimeout(updateAnalogStickVisibility, 50);
+        };
+
+        // Also update on orientation change
+        window.addEventListener("resize", () => {
+          setTimeout(updateAnalogStickVisibility, 100);
+        });
+
+        // Initial update
+        setTimeout(updateAnalogStickVisibility, 100);
+
+        // Expose function to update visibility
+        window.updateAnalogStickVisibility = updateAnalogStickVisibility;
+      })();
       // ================================================================
       // INPUT
       // ================================================================
@@ -3288,6 +3757,21 @@
       // ================================================================
       S.screen = "menu";
       startMenuAnim();
+
+      // Pastikan class map-active terupdate saat ganti screen
+      const originalShowFunction2 = show;
+      show = function (id) {
+        originalShowFunction2(id);
+        if (id === "s-map") {
+          document.body.classList.add("map-active");
+        } else {
+          document.body.classList.remove("map-active");
+        }
+        // Update analog visibility
+        if (window.updateAnalogStickVisibility) {
+          setTimeout(window.updateAnalogStickVisibility, 50);
+        }
+      };
     </script>
   </body>
 </html>
