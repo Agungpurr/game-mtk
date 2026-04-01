@@ -663,6 +663,227 @@
         background: #44aa8818;
         transform: translateX(4px);
       }
+
+      /* ========== MOBILE FRIENDLY & LANDSCAPE ========== */
+      @media (max-width: 768px) {
+        /* Force landscape orientation */
+        body {
+          background: #000;
+          overflow: hidden;
+          position: fixed;
+          width: 100%;
+          height: 100%;
+        }
+
+        /* Rotate warning for portrait mode */
+        .rotate-device {
+          display: none;
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: #000;
+          z-index: 9999;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          text-align: center;
+          font-family: "Press Start 2P", monospace;
+          color: #00ccff;
+        }
+
+        .rotate-device .rotate-icon {
+          font-size: 48px;
+          margin-bottom: 20px;
+          animation: rotate 1.5s ease-in-out infinite;
+        }
+
+        @keyframes rotate {
+          0% {
+            transform: rotate(0deg);
+          }
+          50% {
+            transform: rotate(90deg);
+          }
+          100% {
+            transform: rotate(0deg);
+          }
+        }
+
+        body.portrait .rotate-device {
+          display: flex;
+        }
+
+        body.portrait #game-wrap {
+          display: none;
+        }
+
+        /* Mobile landscape adjustments */
+        body.landscape #game-wrap {
+          display: block;
+        }
+
+        /* Menu mobile */
+        #s-menu {
+          flex-direction: column !important;
+        }
+
+        .menu-left {
+          padding: 20px 30px !important;
+          text-align: center;
+        }
+
+        .m-logo-big {
+          font-size: 28px !important;
+          letter-spacing: 4px !important;
+        }
+
+        .m-logo {
+          font-size: 8px !important;
+        }
+
+        .m-btns {
+          align-items: center;
+        }
+
+        .mbtn {
+          text-align: center !important;
+          padding: 10px 20px !important;
+          font-size: 7px !important;
+        }
+
+        .menu-right {
+          display: none !important;
+        }
+
+        /* HUD mobile */
+        #hud {
+          padding: 5px 10px !important;
+          height: auto !important;
+          flex-wrap: wrap;
+        }
+
+        .hud-box {
+          padding: 3px 8px !important;
+        }
+
+        .hud-val {
+          font-size: 8px !important;
+        }
+
+        /* Battle mobile */
+        .battle-hud {
+          padding: 8px 12px !important;
+          gap: 10px !important;
+        }
+
+        .bhp-name {
+          font-size: 7px !important;
+        }
+
+        .bhp-text {
+          font-size: 8px !important;
+        }
+
+        .bvs {
+          font-size: 10px !important;
+        }
+
+        .q-txt {
+          font-size: 14px !important;
+        }
+
+        .ans-grid {
+          gap: 6px !important;
+        }
+
+        .abtn {
+          padding: 8px !important;
+          font-size: 14px !important;
+        }
+
+        .ulti-lbl,
+        .ulti-combo-lbl {
+          font-size: 6px !important;
+        }
+
+        .ulti-fire {
+          font-size: 7px !important;
+        }
+
+        .battle-bottom {
+          padding: 12px !important;
+        }
+
+        /* Transition mobile */
+        .trans-name {
+          font-size: 24px !important;
+          letter-spacing: 4px !important;
+        }
+
+        .trans-desc {
+          font-size: 11px !important;
+          padding: 0 20px !important;
+        }
+
+        .trans-mobs {
+          font-size: 28px !important;
+        }
+
+        /* Help mobile */
+        #s-help {
+          padding: 20px !important;
+        }
+
+        .help-grid {
+          grid-template-columns: 1fr !important;
+          gap: 12px !important;
+        }
+
+        .help-card {
+          padding: 12px !important;
+        }
+
+        .help-card p {
+          font-size: 12px !important;
+        }
+
+        /* Game Over mobile */
+        .go-title {
+          font-size: 32px !important;
+        }
+
+        .go-score {
+          font-size: 14px !important;
+        }
+
+        .go-reason {
+          font-size: 11px !important;
+          padding: 0 20px !important;
+        }
+      }
+
+      /* Touch-friendly button sizing for mobile */
+      @media (max-width: 768px) and (orientation: landscape) {
+        .abtn {
+          min-height: 44px;
+          min-width: 44px;
+        }
+
+        .mbtn,
+        .trans-btn,
+        .help-back {
+          min-height: 44px;
+        }
+
+        /* Adjust canvas for better visibility */
+        #map-info {
+          font-size: 6px !important;
+          bottom: 5px !important;
+          white-space: nowrap;
+        }
+      }
     </style>
   </head>
   <body>
@@ -2963,6 +3184,61 @@
           if (this.muted) this.stopBGM();
         },
       };
+
+      // ========== MOBILE ORIENTATION DETECTION ==========
+      (function () {
+        // Create rotate warning element
+        const rotateDiv = document.createElement("div");
+        rotateDiv.className = "rotate-device";
+        rotateDiv.innerHTML = `
+    <div class="rotate-icon">🔄</div>
+    <div>PUTAR PONSEL</div>
+    <div style="font-size: 12px; margin-top: 10px;">Gunakan mode landscape</div>
+    <div style="font-size: 10px; margin-top: 20px;">⬅️➡️</div>
+  `;
+        document.body.appendChild(rotateDiv);
+
+        function checkOrientation() {
+          if (window.innerHeight > window.innerWidth) {
+            // Portrait mode
+            document.body.classList.add("portrait");
+            document.body.classList.remove("landscape");
+          } else {
+            // Landscape mode
+            document.body.classList.add("landscape");
+            document.body.classList.remove("portrait");
+
+            // Resize canvas after orientation change
+            setTimeout(() => {
+              resize();
+              if (window.mapLoop) {
+                // Refresh map if active
+                const c = document.getElementById("map-canvas");
+                if (c && c.width !== window.innerWidth) {
+                  c.width = window.innerWidth;
+                  c.height = window.innerHeight;
+                }
+                const bc = document.getElementById("battle-canvas");
+                if (bc && bc.width !== window.innerWidth) {
+                  bc.width = window.innerWidth;
+                  bc.height = window.innerHeight;
+                }
+              }
+            }, 100);
+          }
+        }
+
+        // Check on load
+        checkOrientation();
+
+        // Check on resize
+        window.addEventListener("resize", checkOrientation);
+
+        // Also check on orientation change
+        window.addEventListener("orientationchange", function () {
+          setTimeout(checkOrientation, 50);
+        });
+      })();
 
       // ================================================================
       // INPUT
