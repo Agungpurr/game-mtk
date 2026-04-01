@@ -3,2544 +3,3775 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>⚔️ Petualangan Matematika — RPG</title>
+    <title>⚔️ Math Legend RPG</title>
     <link
-      href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Cinzel:wght@700;900&family=Rajdhani:wght@400;600;700&display=swap"
       rel="stylesheet"
     />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚔️</text></svg>"
+    />
+
     <style>
       * {
         margin: 0;
         padding: 0;
         box-sizing: border-box;
+        user-select: none;
       }
+      html,
       body {
+        width: 100%;
+        height: 100%;
         background: #000;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        min-height: 100vh;
+        overflow: hidden;
         font-family: "Rajdhani", sans-serif;
-        overflow: hidden;
-      }
-      #app {
-        width: 480px;
-        height: 700px;
-        position: relative;
-        overflow: hidden;
-        border-radius: 12px;
-        box-shadow:
-          0 0 60px #004488aa,
-          0 0 120px #002244aa;
       }
       canvas {
         display: block;
-      }
-      .screen {
         position: absolute;
         top: 0;
         left: 0;
-        width: 100%;
-        height: 100%;
-        display: none;
-        flex-direction: column;
       }
-      .screen.active {
+      #game-wrap {
+        position: relative;
+        width: 100vw;
+        height: 100vh;
+        overflow: hidden;
+      }
+
+      /* ===SCREENS=== */
+      .scr {
+        position: absolute;
+        inset: 0;
+        display: none;
+        align-items: center;
+        justify-content: center;
+      }
+      .scr.on {
         display: flex;
       }
 
       /* ===MENU=== */
       #s-menu {
         background: #000;
-        align-items: center;
-        justify-content: center;
-        overflow: hidden;
+        flex-direction: row;
+        align-items: stretch;
       }
-      #menu-canvas {
+      #menu-bg {
         position: absolute;
-        top: 0;
-        left: 0;
+        inset: 0;
       }
-      .menu-content {
+      .menu-left {
         position: relative;
         z-index: 10;
-        text-align: center;
+        flex: 1;
         display: flex;
         flex-direction: column;
-        align-items: center;
-        gap: 16px;
+        justify-content: center;
+        padding: 60px 80px;
+        gap: 28px;
       }
-      .menu-logo {
+      .menu-right {
+        position: relative;
+        z-index: 10;
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .m-logo {
         font-family: "Press Start 2P", monospace;
-        font-size: 11px;
+        font-size: 13px;
         color: #00ccff;
-        text-shadow:
-          0 0 20px #00ccff,
-          0 0 40px #0066ff;
-        line-height: 2.2;
+        text-shadow: 0 0 20px #00ccff88;
+        line-height: 2.4;
         letter-spacing: 3px;
       }
-      .menu-logo span {
+      .m-logo-big {
+        font-family: "Cinzel", serif;
+        font-size: 52px;
+        font-weight: 900;
         color: #fff;
-        font-size: 8px;
-        display: block;
-        color: #88aaff;
+        line-height: 1;
+        letter-spacing: 8px;
+        text-shadow:
+          0 0 40px #00ccff,
+          0 0 80px #0044ff;
       }
-      .menu-player-preview {
-        position: relative;
-        width: 80px;
-        height: 80px;
-        margin: 8px auto;
+      .m-sub {
+        font-size: 13px;
+        color: #446677;
+        letter-spacing: 4px;
+        text-transform: uppercase;
+        margin-top: -8px;
       }
-      .menu-btns {
+      .m-btns {
         display: flex;
         flex-direction: column;
-        gap: 10px;
-        width: 240px;
+        gap: 12px;
+        margin-top: 16px;
       }
       .mbtn {
-        padding: 12px 20px;
+        padding: 14px 32px;
         border: 1px solid;
-        border-radius: 6px;
-        font-family: "Orbitron", monospace;
-        font-size: 11px;
-        font-weight: 700;
+        border-radius: 4px;
+        font-family: "Press Start 2P", monospace;
+        font-size: 9px;
         cursor: pointer;
-        letter-spacing: 1px;
+        letter-spacing: 2px;
         transition: all 0.2s;
         background: transparent;
+        text-align: left;
       }
-      .mbtn-start {
+      .mbtn-play {
         border-color: #00ccff;
         color: #00ccff;
-        box-shadow:
-          0 0 10px #00ccff44,
-          inset 0 0 10px #00ccff11;
+        box-shadow: 0 0 15px #00ccff22;
       }
-      .mbtn-start:hover {
-        background: #00ccff22;
-        box-shadow: 0 0 20px #00ccff88;
+      .mbtn-play:hover {
+        background: #00ccff18;
+        box-shadow: 0 0 30px #00ccff66;
+        transform: translateX(4px);
       }
-      .mbtn-info {
-        border-color: #8844ff;
-        color: #8844ff;
+      .mbtn-help {
+        border-color: #4455aa;
+        color: #4455aa;
       }
-      .mbtn-info:hover {
-        background: #8844ff22;
+      .mbtn-help:hover {
+        background: #4455aa18;
+        transform: translateX(4px);
+      }
+      .m-hint {
+        font-size: 11px;
+        color: #223344;
+        letter-spacing: 2px;
+        margin-top: 8px;
+      }
+      #hero-preview {
+        position: relative;
+        z-index: 10;
       }
 
       /* ===HUD=== */
-      .hud {
+      #hud {
         position: absolute;
         top: 0;
         left: 0;
         right: 0;
-        height: 52px;
-        z-index: 100;
-        padding: 8px 12px;
-        display: flex;
+        height: 56px;
+        z-index: 200;
+        display: none;
+        background: linear-gradient(180deg, #000000ee 0%, transparent 100%);
+        padding: 10px 20px;
+        display: none;
         align-items: center;
-        justify-content: space-between;
-        background: linear-gradient(180deg, #000c 0%, transparent 100%);
+        gap: 20px;
       }
-      .hud-hp {
+      .hud-box {
+        background: #00000088;
+        border: 1px solid #ffffff11;
+        border-radius: 4px;
+        padding: 5px 14px;
+      }
+      .hud-lbl {
+        font-size: 9px;
+        color: #445566;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        display: block;
+      }
+      .hud-val {
+        font-family: "Press Start 2P", monospace;
+        font-size: 10px;
+        color: #00ccff;
+      }
+      .hud-val.gold {
+        color: #ffaa00;
+      }
+      .hud-val.red {
+        color: #ff4455;
+      }
+      .hp-row {
         display: flex;
+        gap: 4px;
         align-items: center;
-        gap: 6px;
+        margin-top: 3px;
       }
-      .hud-hp-label {
-        font-size: 11px;
-        color: #ff4466;
-        font-weight: 700;
-        font-family: "Orbitron", monospace;
-      }
-      .hp-hearts {
-        display: flex;
-        gap: 3px;
-      }
-      .heart {
-        width: 14px;
-        height: 14px;
+      .hp-pip {
+        width: 16px;
+        height: 10px;
+        border-radius: 2px;
         background: #ff3355;
-        clip-path: polygon(50% 90%, 5% 35%, 20% 10%, 50% 30%, 80% 10%, 95% 35%);
         transition: all 0.3s;
       }
-      .heart.empty {
-        background: #331122;
-        box-shadow: none;
+      .hp-pip.empty {
+        background: #220011;
       }
-      .hud-stage {
+      .hud-spacer {
+        flex: 1;
+      }
+      #mini-stage {
         font-family: "Press Start 2P", monospace;
-        font-size: 7px;
+        font-size: 8px;
         color: #ffaa00;
         text-align: center;
+        line-height: 1.8;
       }
-      .hud-stage span {
-        display: block;
-        font-size: 6px;
-        color: #886600;
-        margin-top: 2px;
+
+      /* ===STAGE TRANSITION=== */
+      #s-trans {
+        background: #000;
+        flex-direction: column;
+        gap: 20px;
+        text-align: center;
       }
-      .hud-score {
-        font-family: "Orbitron", monospace;
-        font-size: 11px;
-        color: #00ffaa;
-        text-align: right;
-      }
-      .hud-score span {
-        display: block;
-        font-size: 8px;
-        color: #006644;
-      }
-      .combo-bar {
+      #trans-bg {
         position: absolute;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        height: 3px;
-        background: #00ccff;
-        transform-origin: left;
-        transition: transform 0.5s;
+        inset: 0;
+      }
+      .trans-z {
+        position: relative;
+        z-index: 10;
+      }
+      .trans-num {
+        font-family: "Press Start 2P", monospace;
+        font-size: 9px;
+        color: #445;
+        letter-spacing: 4px;
+      }
+      .trans-name {
+        font-family: "Cinzel", serif;
+        font-size: 48px;
+        font-weight: 900;
+        letter-spacing: 8px;
+        margin: 8px 0;
+      }
+      .trans-desc {
+        font-size: 15px;
+        color: #778;
+        line-height: 1.8;
+        max-width: 500px;
+      }
+      .trans-mobs {
+        font-size: 40px;
+        display: flex;
+        gap: 16px;
+        justify-content: center;
+        margin: 16px 0;
+      }
+      .trans-btn {
+        padding: 14px 48px;
+        border: 1px solid currentColor;
+        border-radius: 4px;
+        background: transparent;
+        font-family: "Press Start 2P", monospace;
+        font-size: 10px;
+        cursor: pointer;
+        letter-spacing: 2px;
+        transition: all 0.2s;
+      }
+      .trans-btn:hover {
+        background: rgba(255, 255, 255, 0.05);
+        transform: scale(1.04);
       }
 
       /* ===MAP=== */
       #s-map {
         background: #000;
+        align-items: stretch;
+        flex-direction: column;
       }
       #map-canvas {
         position: absolute;
-        top: 0;
-        left: 0;
+        inset: 0;
       }
-      .map-hud {
+      .map-hud-wrap {
         position: absolute;
         top: 0;
         left: 0;
         right: 0;
       }
-      .dpad {
+      #map-info {
         position: absolute;
-        bottom: 20px;
+        bottom: 12px;
         left: 50%;
         transform: translateX(-50%);
-        display: grid;
-        grid-template-columns: repeat(3, 44px);
-        grid-template-rows: repeat(3, 44px);
-        gap: 4px;
-        z-index: 50;
-      }
-      .dpad-btn {
-        border-radius: 8px;
-        border: 1px solid #ffffff22;
-        background: #ffffff0a;
-        color: #fff;
-        font-size: 18px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        user-select: none;
-        -webkit-user-select: none;
-      }
-      .dpad-btn:active {
-        background: #00ccff33;
-        border-color: #00ccff;
-      }
-      .dpad-center {
-        opacity: 0;
+        font-family: "Press Start 2P", monospace;
+        font-size: 8px;
+        color: #334455;
+        letter-spacing: 2px;
+        background: #00000088;
+        padding: 6px 16px;
+        border-radius: 20px;
         pointer-events: none;
-      }
-      .encounter-flash {
-        position: absolute;
-        inset: 0;
-        background: #ff220044;
-        z-index: 200;
-        pointer-events: none;
-        border-radius: 12px;
-        opacity: 0;
-        transition: opacity 0.3s;
       }
 
       /* ===BATTLE=== */
       #s-battle {
         background: #000;
+        flex-direction: column;
+        align-items: stretch;
       }
       #battle-canvas {
         position: absolute;
+        inset: 0;
+      }
+      .battle-hud {
+        position: absolute;
         top: 0;
         left: 0;
-        width: 100%;
-        height: 100%;
+        right: 0;
+        padding: 12px 24px;
+        z-index: 50;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 20px;
+        background: linear-gradient(180deg, #000000dd 0%, transparent 100%);
       }
-      .battle-ui {
+      .bhp-wrap {
+        flex: 1;
+        max-width: 280px;
+      }
+      .bhp-name {
+        font-family: "Press Start 2P", monospace;
+        font-size: 9px;
+        margin-bottom: 5px;
+      }
+      .bhp-name.blue {
+        color: #00ccff;
+      }
+      .bhp-name.red {
+        color: #ff4455;
+      }
+      .bhp-bar-outer {
+        height: 10px;
+        background: #111;
+        border-radius: 5px;
+        overflow: hidden;
+        border: 1px solid #ffffff11;
+      }
+      .bhp-bar-inner {
+        height: 100%;
+        border-radius: 5px;
+        transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      .bhp-bar-inner.blue {
+        background: linear-gradient(90deg, #0044aa, #00ccff);
+      }
+      .bhp-bar-inner.red {
+        background: linear-gradient(90deg, #cc0022, #ff6600);
+      }
+      .bhp-text {
+        font-size: 10px;
+        color: #446;
+        font-family: "Press Start 2P", monospace;
+        margin-top: 3px;
+      }
+      .bvs {
+        font-family: "Press Start 2P", monospace;
+        font-size: 12px;
+        color: #334;
+        align-self: center;
+        padding-top: 8px;
+      }
+
+      .battle-bottom {
         position: absolute;
         bottom: 0;
         left: 0;
         right: 0;
-        padding: 12px;
+        padding: 16px 24px;
+        background: linear-gradient(
+          0deg,
+          #000000f0 0%,
+          #00000088 80%,
+          transparent 100%
+        );
         z-index: 50;
-        background: linear-gradient(0deg, #000f 0%, transparent 100%);
       }
-      .question-box {
-        background: #000d;
-        border: 1px solid #00ccff44;
-        border-radius: 10px;
-        padding: 14px 16px;
-        margin-bottom: 10px;
+      .q-box {
+        background: #000000aa;
+        border: 1px solid #00ccff33;
+        border-radius: 8px;
+        padding: 14px 20px;
+        margin-bottom: 12px;
         position: relative;
         overflow: hidden;
       }
-      .question-box::before {
+      .q-box::before {
         content: "";
         position: absolute;
         top: 0;
         left: 0;
         right: 0;
         height: 1px;
-        background: linear-gradient(90deg, transparent, #00ccff, transparent);
+        background: linear-gradient(90deg, transparent, #00ccff66, transparent);
       }
-      .q-type {
+      .q-type-lbl {
         font-size: 10px;
-        color: #00ccff88;
-        font-family: "Orbitron", monospace;
-        letter-spacing: 2px;
-        margin-bottom: 6px;
-      }
-      .q-text {
+        color: #00ccff66;
         font-family: "Press Start 2P", monospace;
-        font-size: 20px;
-        color: #fff;
-        text-align: center;
-        text-shadow: 0 0 10px #00ccff;
-      }
-      .answer-row {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 8px;
+        letter-spacing: 2px;
         margin-bottom: 8px;
       }
+      .q-txt {
+        font-family: "Press Start 2P", monospace;
+        font-size: 22px;
+        color: #fff;
+        text-align: center;
+        text-shadow: 0 0 15px #00ccff88;
+      }
+      .ans-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+        margin-bottom: 10px;
+      }
       .abtn {
-        padding: 13px 8px;
-        border-radius: 8px;
-        border: 1px solid #4466ff66;
-        background: #0a0a2a;
-        color: #8899ff;
-        font-size: 17px;
+        padding: 14px;
+        border-radius: 6px;
+        border: 1px solid #223344;
+        background: #060c18;
+        color: #7799bb;
+        font-size: 18px;
         font-weight: 700;
         cursor: pointer;
         font-family: "Rajdhani", sans-serif;
-        transition: all 0.15s;
+        transition: all 0.12s;
         text-align: center;
       }
-      .abtn:hover {
-        border-color: #00ccff;
+      .abtn:hover:not(:disabled) {
+        border-color: #00ccff88;
         color: #00ccff;
-        background: #00001a;
-        box-shadow: 0 0 12px #00ccff44;
+        background: #001122;
+        box-shadow: 0 0 14px #00ccff33;
       }
       .abtn.correct {
         border-color: #00ff88;
-        background: #002211;
+        background: #001a11;
         color: #00ff88;
-        animation: pulse-green 0.4s;
+        animation: abounce 0.3s;
       }
       .abtn.wrong {
         border-color: #ff3344;
-        background: #220011;
+        background: #1a0008;
         color: #ff3344;
-        animation: shake 0.3s;
+        animation: ashake 0.3s;
       }
-      .battle-info-row {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        font-size: 12px;
-        color: #556677;
-        padding: 0 2px;
-      }
-      .ulti-bar-wrap {
-        height: 6px;
-        background: #111;
-        border-radius: 3px;
-        flex: 1;
-        margin: 0 10px;
-        overflow: hidden;
-      }
-      .ulti-bar {
-        height: 100%;
-        background: linear-gradient(90deg, #0044ff, #00ccff, #ffffff);
-        border-radius: 3px;
-        transition: width 0.4s;
-        width: 0%;
-      }
-      .ulti-ready {
-        color: #00ccff;
-        font-family: "Orbitron", monospace;
-        font-size: 9px;
-        animation: glow-pulse 1s infinite alternate;
-        cursor: pointer;
-      }
-      @keyframes glow-pulse {
-        from {
-          text-shadow: 0 0 4px #00ccff;
-        }
-        to {
-          text-shadow:
-            0 0 16px #00ccff,
-            0 0 30px #0088ff;
-        }
-      }
-      @keyframes pulse-green {
+      @keyframes abounce {
         0%,
         100% {
           transform: scale(1);
         }
         50% {
-          transform: scale(1.1);
+          transform: scale(1.08);
         }
       }
-      @keyframes shake {
+      @keyframes ashake {
         0%,
         100% {
           transform: translateX(0);
         }
         25% {
-          transform: translateX(-5px);
+          transform: translateX(-6px);
         }
         75% {
-          transform: translateX(5px);
+          transform: translateX(6px);
+        }
+      }
+      .ulti-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .ulti-lbl {
+        font-family: "Press Start 2P", monospace;
+        font-size: 7px;
+        color: #334;
+      }
+      .ulti-bar-outer {
+        flex: 1;
+        height: 6px;
+        background: #111;
+        border-radius: 3px;
+        overflow: hidden;
+      }
+      .ulti-bar-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #0044ff, #00ccff, #fff);
+        border-radius: 3px;
+        transition: width 0.4s;
+        width: 0%;
+      }
+      .ulti-fire {
+        font-family: "Press Start 2P", monospace;
+        font-size: 8px;
+        color: #00ccff;
+        cursor: pointer;
+        animation: glowpulse 1s infinite alternate;
+        display: none;
+        letter-spacing: 1px;
+      }
+      .ulti-combo-lbl {
+        font-family: "Press Start 2P", monospace;
+        font-size: 7px;
+        color: #334;
+      }
+      @keyframes glowpulse {
+        from {
+          text-shadow: 0 0 4px #00ccff;
+        }
+        to {
+          text-shadow:
+            0 0 20px #00ccff,
+            0 0 40px #0088ff;
         }
       }
 
-      /* ===HP BARS IN BATTLE=== */
-      .battle-bars {
+      .battle-fb {
         position: absolute;
-        top: 56px;
-        left: 0;
-        right: 0;
-        padding: 0 12px;
-        z-index: 50;
-        display: flex;
-        justify-content: space-between;
-        gap: 12px;
-      }
-      .bbar-wrap {
-        flex: 1;
-      }
-      .bbar-name {
-        font-size: 10px;
-        font-family: "Orbitron", monospace;
-        font-weight: 700;
-        margin-bottom: 3px;
-      }
-      .bbar-name.player {
-        color: #00ccff;
-      }
-      .bbar-name.enemy {
-        color: #ff4455;
-        text-align: right;
-      }
-      .bbar-outer {
-        height: 8px;
-        background: #111;
-        border-radius: 4px;
-        overflow: hidden;
-        border: 1px solid #ffffff11;
-      }
-      .bbar-inner {
-        height: 100%;
-        border-radius: 4px;
-        transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-      }
-      .bbar-inner.player {
-        background: linear-gradient(90deg, #0044aa, #00ccff);
-      }
-      .bbar-inner.enemy {
-        background: linear-gradient(90deg, #ff2244, #ff8800);
-      }
-      .bbar-hp-text {
-        font-size: 9px;
-        margin-top: 2px;
-        color: #556677;
-        font-family: "Orbitron", monospace;
-      }
-      .bbar-hp-text.enemy {
-        text-align: right;
-      }
-
-      /* ===FEEDBACK=== */
-      .battle-feedback {
-        position: absolute;
-        top: 50%;
+        top: 38%;
         left: 50%;
         transform: translate(-50%, -50%);
         font-family: "Press Start 2P", monospace;
-        font-size: 16px;
+        font-size: 14px;
         pointer-events: none;
-        z-index: 200;
+        z-index: 300;
         opacity: 0;
-        transition: opacity 0.3s;
+        transition: opacity 0.25s;
         white-space: nowrap;
       }
-      .bf-correct {
+      .fb-ok {
         color: #00ff88;
         text-shadow: 0 0 20px #00ff88;
       }
-      .bf-wrong {
+      .fb-bad {
         color: #ff3344;
         text-shadow: 0 0 20px #ff3344;
       }
-      .bf-ulti {
+      .fb-ulti {
         color: #00ccff;
         text-shadow:
           0 0 30px #00ccff,
           0 0 60px #0066ff;
-        font-size: 12px;
-      }
-
-      /* ===STAGE TRANSITION=== */
-      #s-transition {
-        background: #000;
-        align-items: center;
-        justify-content: center;
-        text-align: center;
-      }
-      .trans-content {
-        z-index: 10;
-        position: relative;
-      }
-      .trans-stage-num {
-        font-family: "Press Start 2P", monospace;
-        font-size: 9px;
-        color: #666;
-        margin-bottom: 8px;
-        letter-spacing: 3px;
-      }
-      .trans-title {
-        font-family: "Orbitron", monospace;
-        font-size: 22px;
-        font-weight: 900;
-        margin-bottom: 8px;
-      }
-      .trans-desc {
-        font-size: 14px;
-        color: #889;
-        margin-bottom: 24px;
-        line-height: 1.6;
-      }
-      .trans-enemies-preview {
-        display: flex;
-        justify-content: center;
-        gap: 12px;
-        margin-bottom: 24px;
-        font-size: 36px;
-      }
-      #trans-canvas {
-        position: absolute;
-        top: 0;
-        left: 0;
-      }
-      .trans-btn {
-        padding: 12px 32px;
-        border: 1px solid currentColor;
-        border-radius: 6px;
-        background: transparent;
-        font-family: "Orbitron", monospace;
         font-size: 11px;
-        font-weight: 700;
-        cursor: pointer;
-        letter-spacing: 1px;
-        transition: all 0.2s;
       }
 
-      /* ===GAMEOVER / WIN=== */
-      #s-gameover {
+      /* ===GAMEOVER=== */
+      #s-go {
         background: #000;
-        align-items: center;
-        justify-content: center;
-        text-align: center;
         flex-direction: column;
         gap: 16px;
+        text-align: center;
+      }
+      #go-bg {
+        position: absolute;
+        inset: 0;
+      }
+      .go-z {
+        position: relative;
+        z-index: 10;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 14px;
       }
       .go-title {
-        font-family: "Press Start 2P", monospace;
-        font-size: 18px;
-        letter-spacing: 4px;
+        font-family: "Cinzel", serif;
+        font-weight: 900;
+        font-size: 64px;
+        letter-spacing: 8px;
+      }
+      .go-emoji {
+        font-size: 64px;
       }
       .go-score {
-        font-family: "Orbitron", monospace;
-        font-size: 28px;
-        font-weight: 900;
-        margin: 8px 0;
+        font-family: "Press Start 2P", monospace;
+        font-size: 20px;
+        color: #ffaa00;
       }
-      .go-sub {
-        font-size: 14px;
-        color: #778;
+      .go-reason {
+        font-size: 15px;
+        color: #556;
+      }
+      .go-btns {
+        display: flex;
+        gap: 14px;
+        margin-top: 8px;
       }
 
-      /* ===INFO=== */
-      #s-info {
-        background: #050510;
-        padding: 20px;
+      /* ===HELP=== */
+      #s-help {
+        background: #000d1a;
+        flex-direction: column;
+        gap: 0;
         overflow-y: auto;
+        padding: 40px;
+        align-items: flex-start;
       }
-      .info-title {
+      .help-title {
+        font-family: "Press Start 2P", monospace;
+        font-size: 11px;
+        color: #00ccff;
+        margin-bottom: 28px;
+        letter-spacing: 3px;
+      }
+      .help-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        width: 100%;
+        max-width: 900px;
+        margin: 0 auto;
+      }
+      .help-card {
+        background: #060c18;
+        border: 1px solid #00ccff22;
+        border-radius: 8px;
+        padding: 20px;
+      }
+      .help-card h3 {
         font-family: "Press Start 2P", monospace;
         font-size: 9px;
         color: #00ccff;
-        margin-bottom: 16px;
-        text-align: center;
+        margin-bottom: 10px;
         letter-spacing: 2px;
       }
-      .info-section {
-        margin-bottom: 14px;
-        border-left: 2px solid #00ccff44;
-        padding-left: 12px;
+      .help-card p {
+        font-size: 14px;
+        color: #7799aa;
+        line-height: 1.7;
       }
-      .info-section h3 {
-        font-family: "Orbitron", monospace;
-        font-size: 11px;
-        color: #00ccff;
-        margin-bottom: 6px;
-      }
-      .info-section p {
-        font-size: 13px;
-        color: #99aabb;
-        line-height: 1.6;
-      }
-      .info-back {
-        margin-top: 16px;
-        padding: 10px;
-        border: 1px solid #4466ff;
+      .help-back {
+        margin-top: 24px;
+        padding: 12px 32px;
+        border: 1px solid #4455aa;
         background: transparent;
-        border-radius: 6px;
-        color: #4466ff;
-        font-family: "Orbitron", monospace;
-        font-size: 10px;
+        border-radius: 4px;
+        color: #4455aa;
+        font-family: "Press Start 2P", monospace;
+        font-size: 9px;
         cursor: pointer;
-        width: 100%;
-        letter-spacing: 1px;
+        letter-spacing: 2px;
+      }
+
+      /*sound*/
+      .mbtn-sound {
+        border-color: #44aa88;
+        color: #44aa88;
+      }
+      .mbtn-sound:hover {
+        background: #44aa8818;
+        transform: translateX(4px);
+      }
+
+      /* ========== MOBILE FRIENDLY & LANDSCAPE ========== */
+      @media (max-width: 768px) {
+        /* Force landscape orientation */
+        body {
+          background: #000;
+          overflow: hidden;
+          position: fixed;
+          width: 100%;
+          height: 100%;
+        }
+
+        /* Rotate warning for portrait mode */
+        .rotate-device {
+          display: none;
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: #000;
+          z-index: 9999;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          text-align: center;
+          font-family: "Press Start 2P", monospace;
+          color: #00ccff;
+        }
+
+        .rotate-device .rotate-icon {
+          font-size: 48px;
+          margin-bottom: 20px;
+          animation: rotate 1.5s ease-in-out infinite;
+        }
+
+        @keyframes rotate {
+          0% {
+            transform: rotate(0deg);
+          }
+          50% {
+            transform: rotate(90deg);
+          }
+          100% {
+            transform: rotate(0deg);
+          }
+        }
+
+        body.portrait .rotate-device {
+          display: flex;
+        }
+
+        body.portrait #game-wrap {
+          display: none;
+        }
+
+        /* Mobile landscape adjustments */
+        body.landscape #game-wrap {
+          display: block;
+        }
+
+        /* Menu mobile */
+        #s-menu {
+          flex-direction: column !important;
+        }
+
+        .menu-left {
+          padding: 20px 30px !important;
+          text-align: center;
+        }
+
+        .m-logo-big {
+          font-size: 28px !important;
+          letter-spacing: 4px !important;
+        }
+
+        .m-logo {
+          font-size: 8px !important;
+        }
+
+        .m-btns {
+          align-items: center;
+        }
+
+        .mbtn {
+          text-align: center !important;
+          padding: 10px 20px !important;
+          font-size: 7px !important;
+        }
+
+        .menu-right {
+          display: none !important;
+        }
+
+        /* HUD mobile */
+        #hud {
+          padding: 5px 10px !important;
+          height: auto !important;
+          flex-wrap: wrap;
+        }
+
+        .hud-box {
+          padding: 3px 8px !important;
+        }
+
+        .hud-val {
+          font-size: 8px !important;
+        }
+
+        /* Battle mobile */
+        .battle-hud {
+          padding: 8px 12px !important;
+          gap: 10px !important;
+        }
+
+        .bhp-name {
+          font-size: 7px !important;
+        }
+
+        .bhp-text {
+          font-size: 8px !important;
+        }
+
+        .bvs {
+          font-size: 10px !important;
+        }
+
+        .q-txt {
+          font-size: 14px !important;
+        }
+
+        .ans-grid {
+          gap: 6px !important;
+        }
+
+        .abtn {
+          padding: 8px !important;
+          font-size: 14px !important;
+        }
+
+        .ulti-lbl,
+        .ulti-combo-lbl {
+          font-size: 6px !important;
+        }
+
+        .ulti-fire {
+          font-size: 7px !important;
+        }
+
+        .battle-bottom {
+          padding: 12px !important;
+        }
+
+        /* Transition mobile */
+        .trans-name {
+          font-size: 24px !important;
+          letter-spacing: 4px !important;
+        }
+
+        .trans-desc {
+          font-size: 11px !important;
+          padding: 0 20px !important;
+        }
+
+        .trans-mobs {
+          font-size: 28px !important;
+        }
+
+        /* Help mobile */
+        #s-help {
+          padding: 20px !important;
+        }
+
+        .help-grid {
+          grid-template-columns: 1fr !important;
+          gap: 12px !important;
+        }
+
+        .help-card {
+          padding: 12px !important;
+        }
+
+        .help-card p {
+          font-size: 12px !important;
+        }
+
+        /* Game Over mobile */
+        .go-title {
+          font-size: 32px !important;
+        }
+
+        .go-score {
+          font-size: 14px !important;
+        }
+
+        .go-reason {
+          font-size: 11px !important;
+          padding: 0 20px !important;
+        }
+      }
+
+      /* Touch-friendly button sizing for mobile */
+      @media (max-width: 768px) and (orientation: landscape) {
+        .abtn {
+          min-height: 44px;
+          min-width: 44px;
+        }
+
+        .mbtn,
+        .trans-btn,
+        .help-back {
+          min-height: 44px;
+        }
+
+        /* Adjust canvas for better visibility */
+        #map-info {
+          font-size: 6px !important;
+          bottom: 5px !important;
+          white-space: nowrap;
+        }
+      }
+
+      /* Additional mobile optimizations */
+      @media (max-width: 768px) and (orientation: landscape) {
+        /* Make buttons bigger for touch */
+        .abtn {
+          min-height: 50px;
+          min-width: 50px;
+          font-size: 18px !important;
+        }
+
+        .mbtn,
+        .trans-btn,
+        .help-back {
+          min-height: 48px;
+          padding: 12px 24px !important;
+        }
+
+        /* Adjust map info position */
+        #map-info {
+          bottom: 20px !important;
+          font-size: 8px !important;
+          white-space: nowrap;
+          background: rgba(0, 0, 0, 0.7);
+        }
+
+        /* Adjust battle UI for touch */
+        .q-txt {
+          font-size: 16px !important;
+        }
+
+        .battle-bottom {
+          padding-bottom: 20px !important;
+        }
+
+        /* Make sure analog doesn't cover important UI */
+        #analog-stick {
+          bottom: 70px;
+          left: 70px;
+          width: 100px;
+          height: 100px;
+        }
+
+        /* Add touch feedback */
+        .abtn:active,
+        .mbtn:active,
+        .trans-btn:active,
+        .ulti-fire:active {
+          transform: scale(0.95);
+          transition: transform 0.05s;
+        }
+      }
+
+      /* Hide analog stick by default */
+      #analog-stick {
+        display: none !important;
+      }
+
+      /* Only show analog stick on map screen for mobile landscape */
+      @media (max-width: 768px) and (orientation: landscape) {
+        body.map-active #analog-stick {
+          display: block !important;
+        }
+      }
+
+      /* Hide mobile hint by default */
+      .mobile-controls-hint {
+        display: none !important;
+      }
+
+      /* Only show hint on map screen for mobile landscape */
+      @media (max-width: 768px) and (orientation: landscape) {
+        body.map-active .mobile-controls-hint {
+          display: block !important;
+        }
       }
     </style>
   </head>
   <body>
-    <div id="app">
+    <div id="game-wrap">
+      <!-- ===BG CANVASES=== -->
+      <canvas id="menu-bg"></canvas>
+
       <!-- ===MENU=== -->
-      <div class="screen active" id="s-menu">
-        <canvas id="menu-canvas" width="480" height="700"></canvas>
-        <div class="menu-content">
-          <div class="menu-logo">
-            ⚔ MATH LEGEND ⚔<span>RPG EDUKASI MATEMATIKA</span>
-          </div>
-          <canvas
-            id="player-preview-canvas"
-            width="80"
-            height="80"
-            style="position: relative; z-index: 10"
-          ></canvas>
-          <div class="menu-btns">
-            <button class="mbtn mbtn-start" onclick="G.startGame()">
+      <div class="scr on" id="s-menu">
+        <canvas
+          id="menu-bg2"
+          style="position: absolute; inset: 0; z-index: 1"
+        ></canvas>
+        <div class="menu-left">
+          <div class="m-logo">⚔ RPG EDUKASI</div>
+          <div class="m-logo-big">MATH<br />LEGEND</div>
+          <div class="m-sub">Petualangan Matematika</div>
+          <div class="m-btns">
+            <button class="mbtn mbtn-play" onclick="Game.start()">
               ▶ MULAI PETUALANGAN
             </button>
-            <button class="mbtn mbtn-info" onclick="G.showScreen('s-info')">
+            <button class="mbtn mbtn-help" onclick="Game.showHelp()">
               📖 PETUNJUK
             </button>
           </div>
-          <div
-            style="
-              font-size: 10px;
-              color: #334455;
-              font-family: &quot;Orbitron&quot;, monospace;
-              margin-top: 8px;
-            "
+          <div class="m-hint">WASD / Arrow Keys untuk bergerak</div>
+          <button
+            class="mbtn mbtn-sound"
+            id="sound-toggle"
+            onclick="MelodyPlayer.toggleMute()"
           >
-            v2.0 — 6 STAGE
-          </div>
+            🔊 SOUND ON
+          </button>
+        </div>
+        <div class="menu-right">
+          <canvas id="hero-preview-canvas" width="240" height="340"></canvas>
         </div>
       </div>
 
-      <!-- ===INFO=== -->
-      <div class="screen" id="s-info">
-        <div style="padding: 20px; overflow-y: auto; height: 100%">
-          <div class="info-title">📖 CARA BERMAIN</div>
-          <div class="info-section">
-            <h3>🗺️ LABIRIN</h3>
-            <p>
-              Jelajahi labirin gelap! Kamu hanya bisa melihat area sekitar
-              dirimu. Temukan monster untuk bertarung. WASD / tombol arah untuk
-              bergerak.
-            </p>
+      <!-- ===HELP=== -->
+      <div class="scr" id="s-help">
+        <div style="max-width: 900px; width: 100%">
+          <div class="help-title">📖 CARA BERMAIN</div>
+          <div class="help-grid">
+            <div class="help-card">
+              <h3>🗺️ LABIRIN</h3>
+              <p>
+                Jelajahi peta gelap! Hanya area sekitar kamu yang terlihat.
+                Temukan dan sentuh monster untuk memulai pertarungan. Gunakan
+                WASD atau Arrow Keys.
+              </p>
+            </div>
+            <div class="help-card">
+              <h3>⚔️ BATTLE</h3>
+              <p>
+                Jawab soal matematika dengan benar = serang musuh 25 damage
+                (makin besar per stage). Jawaban SALAH = GAME OVER langsung!
+              </p>
+            </div>
+            <div class="help-card">
+              <h3>✨ DOMAIN CAHAYA</h3>
+              <p>
+                Jawab benar 3x berturut → bar ulti penuh → klik DOMAIN! → 5 bola
+                cahaya biru menghantam musuh dengan 3× damage!
+              </p>
+            </div>
+            <div class="help-card">
+              <h3>👹 AI MONSTER</h3>
+              <p>
+                Monster makin cerdas di stage tinggi. Ada yang teleport menjauh,
+                dash kabur, atau kombinasi keduanya. HP monster 2× lipat tiap
+                stage!
+              </p>
+            </div>
+            <div class="help-card">
+              <h3>🏟️ 6 STAGE</h3>
+              <p>
+                Sekolah Gelap → Hutan Terlarang → Luar Angkasa → Neraka → Lautan
+                Dalam → Lahar Abadi. Soal makin sulit per stage!
+              </p>
+            </div>
+            <div class="help-card">
+              <h3>💡 TIPS</h3>
+              <p>
+                Kalahkan SEMUA monster di labirin untuk lanjut ke stage
+                berikutnya. Jangan sampai salah jawab — satu kesalahan = GAME
+                OVER!
+              </p>
+            </div>
           </div>
-          <div class="info-section">
-            <h3>⚔️ BATTLE</h3>
-            <p>
-              Jawab soal matematika dengan benar untuk menyerang musuh. Setiap
-              jawaban benar = 25 damage (naik per stage). Jawaban salah = kena
-              serangan musuh!
-            </p>
-          </div>
-          <div class="info-section">
-            <h3>✨ ULTI — DOMAIN CAHAYA</h3>
-            <p>
-              Jawab benar 3x berturut-turut → ulti bar penuh → klik ULTI! → bola
-              cahaya biru explode ke semua musuh 3× damage!
-            </p>
-          </div>
-          <div class="info-section">
-            <h3>👹 MONSTER AI</h3>
-            <p>
-              Monster makin cerdas di stage tinggi: Teleport menjauh, Dash
-              kabur, menyerang lebih keras, darah 2× lipat setiap stage!
-            </p>
-          </div>
-          <div class="info-section">
-            <h3>🏟️ 6 STAGE</h3>
-            <p>
-              Sekolah Gelap → Hutan → Luar Angkasa → Neraka → Lautan → Lahar.
-              Tiap stage makin brutal!
-            </p>
-          </div>
-          <div class="info-section">
-            <h3>💙 KEKUATAN CAHAYA BIRU</h3>
-            <p>
-              Pukulan cahaya biru = benar! Domain = ulti 3x combo! Kalahkan
-              semua monster di labirin untuk ke stage berikutnya.
-            </p>
-          </div>
-          <button class="info-back" onclick="G.showScreen('s-menu')">
-            ⬅ KEMBALI
-          </button>
+          <button class="help-back" onclick="Game.showMenu()">⬅ KEMBALI</button>
         </div>
       </div>
 
       <!-- ===STAGE TRANSITION=== -->
-      <div class="screen" id="s-transition">
-        <canvas id="trans-canvas" width="480" height="700"></canvas>
-        <div class="trans-content">
-          <div class="trans-stage-num" id="trans-stage-num">STAGE 1</div>
-          <div class="trans-title" id="trans-title" style="color: #00ccff">
-            SEKOLAH GELAP
+      <div class="scr" id="s-trans">
+        <canvas id="trans-bg" style="position: absolute; inset: 0"></canvas>
+        <div class="trans-z">
+          <div class="trans-num" id="t-num">STAGE 1</div>
+          <div class="trans-name" id="t-name">SEKOLAH GELAP</div>
+          <div class="trans-desc" id="t-desc">
+            Koridor sepi... cahaya mati...
           </div>
-          <div class="trans-desc" id="trans-desc">
-            Koridor sepi... cahaya mati...<br />monster bersembunyi di balik
-            kegelapan.
-          </div>
-          <div class="trans-enemies-preview" id="trans-enemies"></div>
-          <button
-            class="trans-btn"
-            id="trans-btn"
-            onclick="G.enterStage()"
-            style="color: #00ccff; border-color: #00ccff"
-          >
+          <div class="trans-mobs" id="t-mobs"></div>
+          <button class="trans-btn" id="t-btn" onclick="Game.enterStage()">
             MASUK ▶
           </button>
         </div>
       </div>
 
       <!-- ===MAP=== -->
-      <div class="screen" id="s-map">
-        <canvas id="map-canvas" width="480" height="700"></canvas>
-        <div class="map-hud">
-          <div class="hud">
-            <div class="hud-hp">
-              <div class="hud-hp-label">HP</div>
-              <div class="hp-hearts" id="hud-hearts"></div>
-            </div>
-            <div class="hud-stage" id="hud-stage-name">
-              SEKOLAH GELAP<span>STAGE 1</span>
-            </div>
-            <div class="hud-score">
-              ⭐ <span id="hud-score-val">0</span
-              ><span id="hud-kills-val">0 musuh</span>
-            </div>
-          </div>
-        </div>
-        <div class="encounter-flash" id="enc-flash"></div>
-        <div class="dpad">
-          <div></div>
-          <div
-            class="dpad-btn"
-            id="dbtn-up"
-            onpointerdown="G.startMove(0,-1)"
-            onpointerup="G.stopMove()"
-          >
-            ▲
-          </div>
-          <div></div>
-          <div
-            class="dpad-btn"
-            id="dbtn-left"
-            onpointerdown="G.startMove(-1,0)"
-            onpointerup="G.stopMove()"
-          >
-            ◀
-          </div>
-          <div class="dpad-center"></div>
-          <div
-            class="dpad-btn"
-            id="dbtn-right"
-            onpointerdown="G.startMove(1,0)"
-            onpointerup="G.stopMove()"
-          >
-            ▶
-          </div>
-          <div></div>
-          <div
-            class="dpad-btn"
-            id="dbtn-down"
-            onpointerdown="G.startMove(0,1)"
-            onpointerup="G.stopMove()"
-          >
-            ▼
-          </div>
-          <div></div>
+      <div class="scr" id="s-map">
+        <canvas id="map-canvas"></canvas>
+        <div id="map-info">
+          WASD / ↑↓←→ untuk bergerak &nbsp;|&nbsp; Sentuh monster untuk battle
         </div>
       </div>
 
       <!-- ===BATTLE=== -->
-      <div class="screen" id="s-battle">
-        <canvas id="battle-canvas" width="480" height="700"></canvas>
-        <div class="hud">
-          <div class="hud-hp">
-            <div class="hud-hp-label">HP</div>
-            <div class="hp-hearts" id="battle-hearts"></div>
-          </div>
-          <div class="hud-stage" id="battle-stage-name">
-            SEKOLAH GELAP<span>STAGE 1</span>
-          </div>
-          <div class="hud-score">⭐ <span id="battle-score-val">0</span></div>
-          <div
-            class="combo-bar"
-            id="combo-bar"
-            style="transform: scaleX(0)"
-          ></div>
-        </div>
-        <div class="battle-bars">
-          <div class="bbar-wrap">
-            <div class="bbar-name player" id="player-name">HERO</div>
-            <div class="bbar-outer">
+      <div class="scr" id="s-battle">
+        <canvas id="battle-canvas"></canvas>
+        <div class="battle-hud">
+          <div class="bhp-wrap">
+            <div class="bhp-name blue">⚔ HERO</div>
+
+            <!-- LIVES DISPLAY - PINDAHKAN KE SINI (DEKAT DARAH HERO) -->
+            <div
+              class="lives-display"
+              style="position: absolute; top: 10px; left: 80px; z-index: 60"
+            >
+              <span style="color: #ff6666; font-size: 14px">❤️</span>
+              <span
+                id="lives-count"
+                style="
+                  color: #fff;
+                  font-family: &quot;Press Start 2P&quot;, monospace;
+                  font-size: 12px;
+                "
+                >3</span
+              >
+            </div>
+
+            <div class="bhp-bar-outer">
               <div
-                class="bbar-inner player"
-                id="player-hpbar"
+                class="bhp-bar-inner blue"
+                id="p-hpbar"
                 style="width: 100%"
               ></div>
             </div>
-            <div class="bbar-hp-text player" id="player-hp-text">100 / 100</div>
+            <div class="bhp-text blue" id="p-hptext">HP</div>
           </div>
-          <div
-            style="
-              width: 40px;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              font-family: &quot;Press Start 2P&quot;;
-              font-size: 8px;
-              color: #334;
-              padding-top: 4px;
-            "
-          >
-            VS
-          </div>
-          <div class="bbar-wrap">
-            <div class="bbar-name enemy" id="enemy-name">???</div>
-            <div class="bbar-outer">
+          <div class="bvs">VS</div>
+          <div class="bhp-wrap" style="text-align: right">
+            <div class="bhp-name red" id="e-name" style="text-align: right">
+              MUSUH
+            </div>
+            <div class="bhp-bar-outer">
               <div
-                class="bbar-inner enemy"
-                id="enemy-hpbar"
+                class="bhp-bar-inner red"
+                id="e-hpbar"
                 style="width: 100%"
               ></div>
             </div>
-            <div class="bbar-hp-text enemy" id="enemy-hp-text">100 / 100</div>
+            <div
+              class="bhp-text"
+              style="text-align: right; color: #446"
+              id="e-hptext"
+            >
+              HP
+            </div>
           </div>
         </div>
-        <div class="battle-feedback" id="battle-feedback"></div>
-        <div class="battle-ui">
-          <div class="question-box">
-            <div class="q-type" id="q-type">PENJUMLAHAN</div>
-            <div class="q-text" id="q-text">5 + 3 = ?</div>
+        <div class="battle-fb" id="battle-fb"></div>
+        <div class="battle-bottom">
+          <div class="q-box">
+            <div class="q-type-lbl" id="q-lbl">PENJUMLAHAN</div>
+            <div class="q-txt" id="q-txt">5 + 3 = ?</div>
           </div>
-          <div class="answer-row" id="answer-row"></div>
-          <div class="battle-info-row">
-            <div
-              style="
-                font-family: &quot;Orbitron&quot;, monospace;
-                font-size: 9px;
-                color: #445566;
-              "
-            >
-              ULTI
+          <div class="ans-grid" id="ans-grid"></div>
+          <div class="ulti-row">
+            <div class="ulti-lbl">DOMAIN</div>
+            <div class="ulti-bar-outer">
+              <div class="ulti-bar-fill" id="ulti-fill"></div>
             </div>
-            <div class="ulti-bar-wrap">
-              <div class="ulti-bar" id="ulti-bar"></div>
-            </div>
-            <div
-              class="ulti-ready"
-              id="ulti-btn"
-              onclick="G.triggerUlti()"
-              style="display: none"
-            >
+            <div class="ulti-fire" id="ulti-btn" onclick="Game.ulti()">
               ⚡ DOMAIN!
             </div>
-            <div
-              id="ulti-combo"
-              style="
-                font-size: 10px;
-                color: #445566;
-                font-family: &quot;Orbitron&quot;, monospace;
-              "
-            >
-              0/3 combo
-            </div>
+            <div class="ulti-combo-lbl" id="ulti-lbl">0/3</div>
           </div>
         </div>
       </div>
 
-      <!-- ===GAMEOVER=== -->
-      <div class="screen" id="s-gameover">
-        <canvas
-          id="go-canvas"
-          width="480"
-          height="700"
-          style="position: absolute; top: 0; left: 0"
-        ></canvas>
-        <div
-          style="
-            position: relative;
-            z-index: 10;
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 12px;
-          "
-        >
+      <!-- ===GAME OVER=== -->
+      <div class="scr" id="s-go">
+        <canvas id="go-bg" style="position: absolute; inset: 0"></canvas>
+        <div class="go-z">
           <div class="go-title" id="go-title" style="color: #ff3344">
             GAME OVER
           </div>
-          <div style="font-size: 40px" id="go-emoji">💀</div>
+          <div class="go-emoji" id="go-emoji">💀</div>
           <div class="go-score">⭐ <span id="go-score">0</span></div>
-          <div class="go-sub" id="go-sub">Kamu gugur di stage 1...</div>
-          <button
-            class="mbtn mbtn-start"
-            style="margin-top: 8px"
-            onclick="G.startGame()"
-          >
-            🔄 MAIN LAGI
-          </button>
-          <button class="mbtn mbtn-info" onclick="G.showScreen('s-menu')">
-            🏠 MENU
-          </button>
+          <div class="go-reason" id="go-reason">
+            Kamu kalah dalam pertempuran!
+          </div>
+          <div class="go-btns">
+            <button class="mbtn mbtn-play" onclick="Game.start()">
+              🔄 MAIN LAGI
+            </button>
+            <button class="mbtn mbtn-help" onclick="Game.showMenu()">
+              🏠 MENU
+            </button>
+          </div>
         </div>
       </div>
     </div>
+    <!-- game-wrap -->
 
     <script>
+      "use strict";
       // ================================================================
-      // GAME ENGINE — MATH RPG v2.0
+      // MATH LEGEND RPG v3 — DESKTOP LANDSCAPE
       // ================================================================
-      const G = (() => {
-        "use strict";
 
-        // ---- STAGES CONFIG ----
-        const STAGES = [
-          {
-            id: 1,
-            name: "SEKOLAH GELAP",
-            color: "#00ccff",
-            bg: "#050818",
-            wallColor: "#0a1428",
-            floorColor: "#070f1e",
-            monsterLight: "#001a2e",
-            desc: "Koridor sepi... cahaya mati...\nmonster bersembunyi di balik kegelapan.",
-            monsters: [
-              {
-                name: "Penyihir Lorong",
-                emoji: "🧙",
-                hp: 100,
-                atk: 20,
-                dmg: 25,
-                moves: ["magic"],
-                speed: 1,
-                aiLv: 1,
-                color: "#aa44ff",
-              },
-              {
-                name: "Prajurit Gelap",
-                emoji: "⚔️",
-                hp: 120,
-                atk: 25,
-                dmg: 25,
-                moves: ["sword"],
-                speed: 1,
-                aiLv: 1,
-                color: "#4488aa",
-              },
-              {
-                name: "Pemanah Bayangan",
-                emoji: "🏹",
-                hp: 80,
-                atk: 30,
-                dmg: 25,
-                moves: ["arrow"],
-                speed: 1,
-                aiLv: 1,
-                color: "#44aa66",
-              },
-            ],
-            monsterCount: 6,
-            fogRadius: 110,
-            mathOps: ["+"],
-            mathRange: [1, 15],
-          },
-          {
-            id: 2,
-            name: "HUTAN TERLARANG",
-            color: "#44ff88",
-            bg: "#020e06",
-            wallColor: "#0a1e0d",
-            floorColor: "#060f08",
-            monsterLight: "#001a0a",
-            desc: "Pohon-pohon raksasa... desir angin gelap...\nbinatang buas mengincar dari kegelapan.",
-            monsters: [
-              {
-                name: "Penyihir Hutan",
-                emoji: "🧙",
-                hp: 200,
-                atk: 35,
-                dmg: 35,
-                moves: ["magic", "teleport"],
-                speed: 1,
-                aiLv: 2,
-                color: "#22aa44",
-              },
-              {
-                name: "Serigala Sihir",
-                emoji: "🐺",
-                hp: 240,
-                atk: 40,
-                dmg: 35,
-                moves: ["bite", "dash"],
-                speed: 2,
-                aiLv: 2,
-                color: "#668866",
-              },
-              {
-                name: "Peri Jahat",
-                emoji: "🧚",
-                hp: 160,
-                atk: 45,
-                dmg: 35,
-                moves: ["arrow", "teleport"],
-                speed: 2,
-                aiLv: 2,
-                color: "#88ff44",
-              },
-            ],
-            monsterCount: 7,
-            fogRadius: 100,
-            mathOps: ["+", "-"],
-            mathRange: [5, 25],
-          },
-          {
-            id: 3,
-            name: "LUAR ANGKASA",
-            color: "#ff88ff",
-            bg: "#030006",
-            wallColor: "#0d001a",
-            floorColor: "#060008",
-            monsterLight: "#0a001a",
-            desc: "Kegelapan tak bertepi... bintang-bintang asing...\nentitas dari dimensi lain mengintai.",
-            monsters: [
-              {
-                name: "Alien Psionic",
-                emoji: "👾",
-                hp: 400,
-                atk: 50,
-                dmg: 40,
-                moves: ["magic", "teleport"],
-                speed: 2,
-                aiLv: 3,
-                color: "#ff44ff",
-              },
-              {
-                name: "Robot Pembunuh",
-                emoji: "🤖",
-                hp: 480,
-                atk: 55,
-                dmg: 40,
-                moves: ["sword", "dash"],
-                speed: 2,
-                aiLv: 3,
-                color: "#8888ff",
-              },
-              {
-                name: "Bintang Neraka",
-                emoji: "⭐",
-                hp: 360,
-                atk: 60,
-                dmg: 40,
-                moves: ["magic", "arrow"],
-                speed: 1,
-                aiLv: 3,
-                color: "#ffff44",
-              },
-            ],
-            monsterCount: 8,
-            fogRadius: 90,
-            mathOps: ["+", "-", "×"],
-            mathRange: [2, 30],
-          },
-          {
-            id: 4,
-            name: "NERAKA",
-            color: "#ff4400",
-            bg: "#0a0000",
-            wallColor: "#1a0500",
-            floorColor: "#0d0200",
-            monsterLight: "#200500",
-            desc: "Lautan api... jeritan abadi...\njendral setan menguasai kegelapan ini.",
-            monsters: [
-              {
-                name: "Iblis Api",
-                emoji: "😈",
-                hp: 800,
-                atk: 70,
-                dmg: 50,
-                moves: ["magic", "teleport", "dash"],
-                speed: 2,
-                aiLv: 4,
-                color: "#ff2200",
-              },
-              {
-                name: "Setan Pedang",
-                emoji: "👹",
-                hp: 960,
-                atk: 80,
-                dmg: 50,
-                moves: ["sword", "dash"],
-                speed: 3,
-                aiLv: 4,
-                color: "#ff6600",
-              },
-              {
-                name: "Malaikat Jatuh",
-                emoji: "👿",
-                hp: 720,
-                atk: 90,
-                dmg: 50,
-                moves: ["arrow", "teleport"],
-                speed: 2,
-                aiLv: 4,
-                color: "#ff4488",
-              },
-            ],
-            monsterCount: 8,
-            fogRadius: 80,
-            mathOps: ["+", "-", "×"],
-            mathRange: [5, 40],
-          },
-          {
-            id: 5,
-            name: "KEDALAMAN LAUTAN",
-            color: "#0088ff",
-            bg: "#000a14",
-            wallColor: "#00111e",
-            floorColor: "#000810",
-            monsterLight: "#001122",
-            desc: "Tekanan gelap menghimpit...\nmakhluk purba bangkit dari palung terdalam.",
-            monsters: [
-              {
-                name: "Kraken Sihir",
-                emoji: "🦑",
-                hp: 1600,
-                atk: 100,
-                dmg: 60,
-                moves: ["magic", "teleport", "dash"],
-                speed: 3,
-                aiLv: 5,
-                color: "#0066ff",
-              },
-              {
-                name: "Naga Laut",
-                emoji: "🐉",
-                hp: 1920,
-                atk: 110,
-                dmg: 60,
-                moves: ["sword", "dash"],
-                speed: 3,
-                aiLv: 5,
-                color: "#00aaff",
-              },
-              {
-                name: "Dewa Ikan",
-                emoji: "🐋",
-                hp: 1440,
-                atk: 120,
-                dmg: 60,
-                moves: ["arrow", "teleport"],
-                speed: 2,
-                aiLv: 5,
-                color: "#44ddff",
-              },
-            ],
-            monsterCount: 9,
-            fogRadius: 75,
-            mathOps: ["-", "×"],
-            mathRange: [3, 50],
-          },
-          {
-            id: 6,
-            name: "LAHAR ABADI",
-            color: "#ff6600",
-            bg: "#080100",
-            wallColor: "#1a0800",
-            floorColor: "#0c0400",
-            monsterLight: "#1a0a00",
-            desc: "Ujung dunia... lahar mengalir tanpa henti...\nraja iblis menunggu di puncak kegelapan.",
-            monsters: [
-              {
-                name: "Raja Iblis",
-                emoji: "💀",
-                hp: 3200,
-                atk: 140,
-                dmg: 80,
-                moves: ["magic", "teleport", "dash"],
-                speed: 3,
-                aiLv: 6,
-                color: "#ff4400",
-              },
-              {
-                name: "Golem Lahar",
-                emoji: "🔥",
-                hp: 3840,
-                atk: 150,
-                dmg: 80,
-                moves: ["sword", "dash"],
-                speed: 2,
-                aiLv: 6,
-                color: "#ff8800",
-              },
-              {
-                name: "Phoenix Kegelapan",
-                emoji: "🦅",
-                hp: 2880,
-                atk: 160,
-                dmg: 80,
-                moves: ["magic", "arrow", "teleport"],
-                speed: 4,
-                aiLv: 6,
-                color: "#ffcc00",
-              },
-            ],
-            monsterCount: 10,
-            fogRadius: 70,
-            mathOps: ["×", "-"],
-            mathRange: [4, 60],
-          },
-        ];
+      // ---- STAGES ----
+      const STAGES = [
+        {
+          id: 1,
+          name: "SEKOLAH GELAP",
+          color: "#00ccff",
+          bg: "#04080f",
+          wc: "#0a1428",
+          fc: "#060d1a",
+          desc: "Koridor sepi... cahaya redup...\nmonster berkeliaran di balik kegelapan.",
+          mobs: [
+            {
+              name: "Penyihir Lorong",
+              emoji: "🧙",
+              hp: 100,
+              atk: 30,
+              moves: ["magic"],
+              aiLv: 1,
+              col: "#aa44ff",
+            },
+            {
+              name: "Prajurit Gelap",
+              emoji: "⚔️",
+              hp: 120,
+              atk: 35,
+              moves: ["sword"],
+              aiLv: 1,
+              col: "#4488cc",
+            },
+            {
+              name: "Pemanah Bayang",
+              emoji: "🏹",
+              hp: 80,
+              atk: 40,
+              moves: ["arrow"],
+              aiLv: 1,
+              col: "#44aa66",
+            },
+          ],
+          count: 5,
+          fog: 150,
+          ops: ["+"],
+          range: [1, 12],
+        },
+        {
+          id: 2,
+          name: "HUTAN TERLARANG",
+          color: "#44ff88",
+          bg: "#030a04",
+          wc: "#0a1e0d",
+          fc: "#060f08",
+          desc: "Pohon raksasa berdiri gelap...\nbinatang buas mengincar dari semak.",
+          mobs: [
+            {
+              name: "Penyihir Hutan",
+              emoji: "🧙",
+              hp: 200,
+              atk: 50,
+              moves: ["magic", "teleport"],
+              aiLv: 2,
+              col: "#22aa44",
+            },
+            {
+              name: "Serigala Sihir",
+              emoji: "🐺",
+              hp: 240,
+              atk: 60,
+              moves: ["bite", "dash"],
+              aiLv: 2,
+              col: "#668866",
+            },
+            {
+              name: "Peri Jahat",
+              emoji: "🧚",
+              hp: 160,
+              atk: 70,
+              moves: ["arrow", "teleport"],
+              aiLv: 2,
+              col: "#88ff44",
+            },
+          ],
+          count: 6,
+          fog: 130,
+          ops: ["+", "-"],
+          range: [5, 20],
+        },
+        {
+          id: 3,
+          name: "LUAR ANGKASA",
+          color: "#ff88ff",
+          bg: "#020006",
+          wc: "#0d001a",
+          fc: "#060008",
+          desc: "Kegelapan tak bertepi...\nentitas asing dari dimensi lain.",
+          mobs: [
+            {
+              name: "Alien Psionic",
+              emoji: "👾",
+              hp: 400,
+              atk: 70,
+              moves: ["magic", "teleport"],
+              aiLv: 3,
+              col: "#ff44ff",
+            },
+            {
+              name: "Robot Pembunuh",
+              emoji: "🤖",
+              hp: 480,
+              atk: 80,
+              moves: ["sword", "dash"],
+              aiLv: 3,
+              col: "#8888ff",
+            },
+            {
+              name: "Bintang Neraka",
+              emoji: "⭐",
+              hp: 360,
+              atk: 90,
+              moves: ["magic", "arrow"],
+              aiLv: 3,
+              col: "#ffff44",
+            },
+          ],
+          count: 7,
+          fog: 110,
+          ops: ["+", "-", "×"],
+          range: [2, 25],
+        },
+        {
+          id: 4,
+          name: "NERAKA",
+          color: "#ff4400",
+          bg: "#080000",
+          wc: "#1a0500",
+          fc: "#0d0200",
+          desc: "Api abadi membakar...\njendral setan menunggu di ujung.",
+          mobs: [
+            {
+              name: "Iblis Api",
+              emoji: "😈",
+              hp: 800,
+              atk: 100,
+              moves: ["magic", "teleport", "dash"],
+              aiLv: 4,
+              col: "#ff2200",
+            },
+            {
+              name: "Setan Pedang",
+              emoji: "👹",
+              hp: 960,
+              atk: 110,
+              moves: ["sword", "dash"],
+              aiLv: 4,
+              col: "#ff6600",
+            },
+            {
+              name: "Malaikat Jatuh",
+              emoji: "👿",
+              hp: 720,
+              atk: 120,
+              moves: ["arrow", "teleport"],
+              aiLv: 4,
+              col: "#ff4488",
+            },
+          ],
+          count: 8,
+          fog: 90,
+          ops: ["+", "-", "×"],
+          range: [3, 35],
+        },
+        {
+          id: 5,
+          name: "LAUTAN DALAM",
+          color: "#0088ff",
+          bg: "#000810",
+          wc: "#00111e",
+          fc: "#000608",
+          desc: "Tekanan gelap menghimpit...\nmakhluk purba bangkit.",
+          mobs: [
+            {
+              name: "Kraken Sihir",
+              emoji: "🦑",
+              hp: 1600,
+              atk: 140,
+              moves: ["magic", "teleport", "dash"],
+              aiLv: 5,
+              col: "#0066ff",
+            },
+            {
+              name: "Naga Laut",
+              emoji: "🐉",
+              hp: 1920,
+              atk: 150,
+              moves: ["sword", "dash"],
+              aiLv: 5,
+              col: "#00aaff",
+            },
+            {
+              name: "Dewa Ikan",
+              emoji: "🐋",
+              hp: 1440,
+              atk: 160,
+              moves: ["arrow", "teleport"],
+              aiLv: 5,
+              col: "#44ddff",
+            },
+          ],
+          count: 9,
+          fog: 70,
+          ops: ["-", "×"],
+          range: [4, 45],
+        },
+        {
+          id: 6,
+          name: "LAHAR ABADI",
+          color: "#ff6600",
+          bg: "#060100",
+          wc: "#1a0800",
+          fc: "#0c0400",
+          desc: "Ujung dunia... lahar tanpa henti...\nraja iblis menanti.",
+          mobs: [
+            {
+              name: "Raja Iblis",
+              emoji: "💀",
+              hp: 3200,
+              atk: 180,
+              moves: ["magic", "teleport", "dash"],
+              aiLv: 6,
+              col: "#ff4400",
+            },
+            {
+              name: "Golem Lahar",
+              emoji: "🔥",
+              hp: 3840,
+              atk: 200,
+              moves: ["sword", "dash"],
+              aiLv: 6,
+              col: "#ff8800",
+            },
+            {
+              name: "Phoenix Gelap",
+              emoji: "🦅",
+              hp: 2880,
+              atk: 220,
+              moves: ["magic", "arrow", "teleport"],
+              aiLv: 6,
+              col: "#ffcc00",
+            },
+          ],
+          count: 10,
+          fog: 55,
+          ops: ["×", "-"],
+          range: [5, 60],
+        },
+      ];
 
-        // ---- STATE ----
-        let state = {};
-        let mapCtx, battleCtx, menuCtx, transCtx, goCtx;
-        let animFrame, moveInterval, battleAnim;
-        let particles = [],
-          projectiles = [],
-          effectQueue = [];
+      // ---- GAME STATE ----
+      const S = {
+        screen: "menu",
+        stageIdx: 0,
+        score: 0,
+        hp: 3,
+        maxHp: 3,
+        combo: 0,
+        ultiReady: false,
+        // Map
+        map: [],
+        mW: 32,
+        mH: 20,
+        tS: 40,
+        player: { x: 1, y: 1, px: 40, py: 40, dir: 1, walk: 0, moving: false },
+        monsters: [],
+        mKilled: 0,
+        lives: 3, // nyawa total pemain
+        maxLives: 5, // maksimal nyawa (bisa bertambah)
+        mTotal: 0,
+        // Battle
+        inBattle: false,
+        curMon: null,
+        pBHp: 100,
+        pBMaxHp: 100,
+        eHp: 0,
+        eMaxHp: 0,
+        answer: 0,
+        // Anim
+        bParticles: [],
+        bProj: [],
+        bShake: 0,
+        eShake: 0,
+        domainActive: false,
+        domainR: 0,
+        mapParticles: [],
+        frame: 0,
+        moveInterval: null,
+      };
 
-        function initState() {
-          state = {
-            screen: "s-menu",
-            stageIdx: 0,
-            hp: 5,
-            maxHp: 5,
-            score: 0,
-            combo: 0,
-            ultiReady: false,
-            // map
-            map: [],
-            mapW: 25,
-            mapH: 25,
-            tileSize: 32,
-            player: { x: 1, y: 1, px: 0, py: 0, moving: false },
-            monsters: [],
-            monstersKilled: 0,
-            totalMonstersThisStage: 0,
-            // battle
-            inBattle: false,
-            currentMonster: null,
-            playerBattleHp: 100,
-            playerBattleMaxHp: 100,
-            enemyHp: 0,
-            enemyMaxHp: 0,
-            correctAnswer: 0,
-            // battle anim
-            playerX: 100,
-            playerY: 420,
-            enemyX: 360,
-            enemyY: 280,
-            // particles/fx
-            particles: [],
-            projectiles: [],
-            domainActive: false,
-            frameCount: 0,
-            moveDx: 0,
-            moveDy: 0,
-          };
-        }
+      // ---- CANVAS REFS ----
+      let mapCtx, battleCtx, heroCtx, transCtx, goCtx, menuCtx;
+      let mapRaf, battleRaf, menuRaf;
+      let W = window.innerWidth,
+        H = window.innerHeight;
 
-        // ---- MAZE GENERATION ----
-        function generateMaze(w, h) {
-          const grid = Array.from({ length: h }, () => Array(w).fill(1));
-          function carve(x, y) {
-            const dirs = [
-              [2, 0],
-              [-2, 0],
-              [0, 2],
-              [0, -2],
-            ].sort(() => Math.random() - 0.5);
-            for (const [dx, dy] of dirs) {
-              const nx = x + dx,
-                ny = y + dy;
-              if (
-                nx > 0 &&
-                ny > 0 &&
-                nx < w - 1 &&
-                ny < h - 1 &&
-                grid[ny][nx] === 1
-              ) {
-                grid[y + dy / 2][x + dx / 2] = 0;
-                grid[ny][nx] = 0;
-                carve(nx, ny);
-              }
-            }
-          }
-          grid[1][1] = 0;
-          carve(1, 1);
-          return grid;
-        }
-
-        function getOpenTiles() {
-          const tiles = [];
-          for (let y = 0; y < state.mapH; y++)
-            for (let x = 0; x < state.mapW; x++)
-              if (state.map[y][x] === 0) tiles.push({ x, y });
-          return tiles;
-        }
-
-        function getRandomOpenTile(minDist = 3) {
-          const tiles = getOpenTiles().filter(
-            (t) =>
-              Math.abs(t.x - state.player.x) > minDist ||
-              Math.abs(t.y - state.player.y) > minDist,
-          );
-          return (
-            tiles[Math.floor(Math.random() * tiles.length)] || { x: 3, y: 3 }
-          );
-        }
-
-        function spawnMonsters() {
-          const stage = STAGES[state.stageIdx];
-          state.monsters = [];
-          for (let i = 0; i < stage.monsterCount; i++) {
-            const mDef = stage.monsters[i % stage.monsters.length];
-            const tile = getRandomOpenTile(5);
-            state.monsters.push({
-              ...mDef,
-              hp: mDef.hp,
-              maxHp: mDef.hp,
-              x: tile.x,
-              y: tile.y,
-              px: tile.x * state.tileSize,
-              py: tile.y * state.tileSize,
-              id: i,
-              alive: true,
-              aiTimer: 0,
-              aiState: "idle",
-              fleeTimer: 0,
-            });
-          }
-          state.totalMonstersThisStage = stage.monsterCount;
-          state.monstersKilled = 0;
-        }
-
-        // ---- SCREEN MANAGEMENT ----
-        function showScreen(id) {
-          document
-            .querySelectorAll(".screen")
-            .forEach((s) => s.classList.remove("active"));
-          document.getElementById(id).classList.add("active");
-          state.screen = id;
-        }
-
-        function startGame() {
-          initState();
-          showStageTransition(0);
-        }
-
-        function showStageTransition(idx) {
-          const stage = STAGES[idx];
-          state.stageIdx = idx;
-          document.getElementById("trans-stage-num").textContent =
-            `STAGE ${stage.id}`;
-          document.getElementById("trans-title").textContent = stage.name;
-          document.getElementById("trans-title").style.color = stage.color;
-          document.getElementById("trans-desc").textContent = stage.desc;
-          document.getElementById("trans-enemies").textContent = stage.monsters
-            .map((m) => m.emoji)
-            .join(" ");
-          const btn = document.getElementById("trans-btn");
-          btn.style.color = stage.color;
-          btn.style.borderColor = stage.color;
-          showScreen("s-transition");
-          animateTransition(stage);
-        }
-
-        function animateTransition(stage) {
-          const c = document.getElementById("trans-canvas");
-          const ctx = c.getContext("2d");
-          let t = 0;
-          function loop() {
-            ctx.clearRect(0, 0, 480, 700);
-            ctx.fillStyle = stage.bg;
-            ctx.fillRect(0, 0, 480, 700);
-            // floating particles
-            for (let i = 0; i < 30; i++) {
-              const ang = (t * 0.02 + i * 0.21) * Math.PI * 2;
-              const r = 80 + i * 8;
-              const x = 240 + Math.cos(ang + i) * r * 0.4;
-              const y = 350 + Math.sin(ang + i * 0.7) * r * 0.3;
-              const a = 0.3 + 0.3 * Math.sin(t * 0.05 + i);
-              ctx.beginPath();
-              ctx.arc(x, y, 2 + Math.sin(t * 0.03 + i) * 1.5, 0, Math.PI * 2);
-              ctx.fillStyle =
-                stage.color +
-                Math.floor(a * 255)
-                  .toString(16)
-                  .padStart(2, "0");
-              ctx.fill();
-            }
-            t++;
-            if (state.screen === "s-transition") requestAnimationFrame(loop);
-          }
-          loop();
-        }
-
-        function enterStage() {
-          const stage = STAGES[state.stageIdx];
-          state.map = generateMaze(state.mapW, state.mapH);
-          state.player = {
-            x: 1,
-            y: 1,
-            px: state.tileSize,
-            py: state.tileSize,
-            moving: false,
-          };
-          state.playerBattleHp = state.playerBattleMaxHp;
-          state.combo = 0;
-          state.ultiReady = false;
-          spawnMonsters();
-          updateHUD();
-          showScreen("s-map");
-          startMapLoop();
-        }
-
-        // ---- MAP RENDERING ----
-        function startMapLoop() {
-          if (animFrame) cancelAnimationFrame(animFrame);
-          const c = document.getElementById("map-canvas");
-          mapCtx = c.getContext("2d");
-          function loop() {
-            updateMapPhysics();
-            checkMonsterProximity();
-            updateMapAI();
-            renderMap();
-            animFrame = requestAnimationFrame(loop);
-          }
-          loop();
-        }
-
-        function updateMapPhysics() {
-          const p = state.player;
-          const ts = state.tileSize;
-          const targetPx = p.x * ts,
-            targetPy = p.y * ts;
-          p.px += (targetPx - p.px) * 0.2;
-          p.py += (targetPy - p.py) * 0.2;
-          // monsters smooth move
-          for (const m of state.monsters) {
-            if (!m.alive) continue;
-            m.px += (m.x * ts - m.px) * 0.15;
-            m.py += (m.y * ts - m.py) * 0.15;
-          }
-        }
-
-        function updateMapAI() {
-          const stage = STAGES[state.stageIdx];
-          for (const m of state.monsters) {
-            if (!m.alive) continue;
-            m.aiTimer++;
-            if (m.aiTimer < 60) continue;
-            m.aiTimer = 0;
-            const px = state.player.x,
-              py = state.player.y;
-            const dx = px - m.x,
-              dy = py - m.y;
-            const dist = Math.sqrt(dx * dx + dy * dy);
-            const aiLv = m.aiLv;
-            // AI behavior based on level
-            if (aiLv >= 3 && dist < 8) {
-              // flee behavior
-              const hasTeleport = m.moves.includes("teleport");
-              const hasDash = m.moves.includes("dash");
-              if (hasTeleport && Math.random() < 0.35) {
-                const tile = getRandomOpenTile(8);
-                m.x = tile.x;
-                m.y = tile.y;
-                spawnParticleAt(m.px, m.py, "#ff00ff", "teleport");
-              } else if (hasDash && Math.random() < 0.4) {
-                const awayX = m.x - (dx > 0 ? 1 : -1) * 2;
-                const awayY = m.y - (dy > 0 ? 1 : -1) * 2;
-                const clampedX = Math.max(1, Math.min(state.mapW - 2, awayX));
-                const clampedY = Math.max(1, Math.min(state.mapH - 2, awayY));
-                if (state.map[clampedY][clampedX] === 0) {
-                  m.x = clampedX;
-                  m.y = clampedY;
-                }
-                spawnParticleAt(m.px, m.py, "#ffaa00", "dash");
-              }
-            }
-          }
-        }
-
-        function spawnParticleAt(x, y, color, type) {
-          for (let i = 0; i < 12; i++) {
-            particles.push({
-              x,
-              y,
-              vx: (Math.random() - 0.5) * 4,
-              vy: (Math.random() - 0.5) * 4,
-              life: 1,
-              decay: 0.05,
-              color,
-              size: 3 + Math.random() * 3,
-              type,
-            });
-          }
-        }
-
-        function checkMonsterProximity() {
-          for (const m of state.monsters) {
-            if (!m.alive) continue;
-            if (m.x === state.player.x && m.y === state.player.y) {
-              triggerBattle(m);
-              return;
-            }
-            const d =
-              Math.abs(m.x - state.player.x) + Math.abs(m.y - state.player.y);
-            if (d === 1) {
-              // adjacent — flash
-              const fl = document.getElementById("enc-flash");
-              fl.style.opacity = "0.4";
-              setTimeout(() => (fl.style.opacity = "0"), 300);
-              triggerBattle(m);
-              return;
-            }
-          }
-        }
-
-        function renderMap() {
-          const ctx = mapCtx;
-          const stage = STAGES[state.stageIdx];
-          const ts = state.tileSize;
-          const W = 480,
-            H = 700;
-          ctx.fillStyle = "#000";
-          ctx.fillRect(0, 0, W, H);
-
-          const camX = state.player.px + ts / 2 - W / 2;
-          const camY = state.player.py + ts / 2 - H / 2;
-
-          // draw tiles
-          const startTx = Math.floor(camX / ts) - 1;
-          const startTy = Math.floor(camY / ts) - 1;
-          for (let ty = startTy; ty < startTy + H / ts + 2; ty++) {
-            for (let tx = startTx; tx < startTx + W / ts + 2; tx++) {
-              if (ty < 0 || ty >= state.mapH || tx < 0 || tx >= state.mapW)
-                continue;
-              const sx = tx * ts - camX,
-                sy = ty * ts - camY;
-              if (state.map[ty][tx] === 1) {
-                ctx.fillStyle = stage.wallColor;
-                ctx.fillRect(sx, sy, ts, ts);
-                ctx.strokeStyle = "#ffffff08";
-                ctx.strokeRect(sx, sy, ts, ts);
-              } else {
-                ctx.fillStyle = stage.floorColor;
-                ctx.fillRect(sx, sy, ts, ts);
-                // subtle grid
-                ctx.strokeStyle = "#ffffff05";
-                ctx.strokeRect(sx, sy, ts, ts);
-              }
-            }
-          }
-
-          // draw monsters
-          ctx.font = `${ts - 4}px serif`;
-          ctx.textAlign = "center";
-          ctx.textBaseline = "middle";
-          for (const m of state.monsters) {
-            if (!m.alive) continue;
-            const sx = m.px - camX + ts / 2,
-              sy = m.py - camY + ts / 2;
-            // glow
-            const grad = ctx.createRadialGradient(sx, sy, 0, sx, sy, ts);
-            grad.addColorStop(0, m.color + "44");
-            grad.addColorStop(1, "transparent");
-            ctx.fillStyle = grad;
-            ctx.beginPath();
-            ctx.arc(sx, sy, ts, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.fillStyle = "#fff";
-            ctx.fillText(m.emoji, sx, sy);
-          }
-
-          // draw particles
-          for (let i = particles.length - 1; i >= 0; i--) {
-            const p = particles[i];
-            p.x += p.vx;
-            p.y += p.vy;
-            p.life -= p.decay;
-            if (p.life <= 0) {
-              particles.splice(i, 1);
-              continue;
-            }
-            ctx.globalAlpha = p.life;
-            ctx.beginPath();
-            ctx.arc(
-              p.x - camX + ts / 2,
-              p.y - camY + ts / 2,
-              p.size,
-              0,
-              Math.PI * 2,
-            );
-            ctx.fillStyle = p.color;
-            ctx.fill();
-            ctx.globalAlpha = 1;
-          }
-
-          // draw player (blue glow)
-          const px = state.player.px - camX + ts / 2;
-          const py = state.player.py - camY + ts / 2;
-          // blue aura
-          const pGrad = ctx.createRadialGradient(px, py, 0, px, py, ts * 1.5);
-          pGrad.addColorStop(0, "#00ccff55");
-          pGrad.addColorStop(0.5, "#0044ff22");
-          pGrad.addColorStop(1, "transparent");
-          ctx.fillStyle = pGrad;
-          ctx.beginPath();
-          ctx.arc(px, py, ts * 1.5, 0, Math.PI * 2);
-          ctx.fill();
-          // player char
-          ctx.font = `${ts}px serif`;
-          ctx.fillText("🧑", px, py);
-          // blue ring
-          ctx.strokeStyle = "#00ccff66";
-          ctx.lineWidth = 2;
-          ctx.beginPath();
-          ctx.arc(px, py, ts * 0.6, 0, Math.PI * 2);
-          ctx.stroke();
-          ctx.lineWidth = 1;
-
-          // FOG OF WAR
-          const fogR = STAGES[state.stageIdx].fogRadius;
-          const fogGrad = ctx.createRadialGradient(
-            px,
-            py,
-            fogR * 0.6,
-            px,
-            py,
-            fogR * 1.3,
-          );
-          fogGrad.addColorStop(0, "transparent");
-          fogGrad.addColorStop(0.4, "rgba(0,0,0,0.5)");
-          fogGrad.addColorStop(1, "rgba(0,0,0,0.97)");
-          ctx.fillStyle = fogGrad;
-          ctx.fillRect(0, 0, W, H);
-
-          // light flicker
-          ctx.globalAlpha = 0.03 * Math.sin(Date.now() * 0.003);
-          ctx.fillStyle = "#00ccff";
-          ctx.beginPath();
-          ctx.arc(px, py, fogR * 0.5, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.globalAlpha = 1;
-
-          // enemies remaining
-          const alive = state.monsters.filter((m) => m.alive).length;
-          ctx.font = "bold 12px Rajdhani";
-          ctx.fillStyle = stage.color + "cc";
-          ctx.textAlign = "left";
-          ctx.fillText(`👹 ${alive} musuh tersisa`, 12, H - 20);
-          if (alive === 0) {
-            ctx.fillStyle = stage.color;
-            ctx.textAlign = "center";
-            ctx.font = "bold 14px Orbitron,monospace";
-            ctx.fillText("SEMUA MUSUH KALAH! STAGE SELESAI!", W / 2, H / 2);
-            setTimeout(() => {
-              if (state.stageIdx < STAGES.length - 1) {
-                showStageTransition(state.stageIdx + 1);
-              } else {
-                showVictory();
-              }
-            }, 2000);
-          }
-        }
-
-        // ---- MOVEMENT ----
-        function movePlayer(dx, dy) {
-          const nx = state.player.x + dx,
-            ny = state.player.y + dy;
-          if (nx < 0 || ny < 0 || nx >= state.mapW || ny >= state.mapH) return;
-          if (state.map[ny][nx] === 1) return;
-          state.player.x = nx;
-          state.player.y = ny;
-        }
-
-        let moveIntervalId = null;
-        function startMove(dx, dy) {
-          movePlayer(dx, dy);
-          stopMove();
-          moveIntervalId = setInterval(() => movePlayer(dx, dy), 180);
-        }
-        function stopMove() {
-          clearInterval(moveIntervalId);
-        }
-
-        // keyboard
-        document.addEventListener("keydown", (e) => {
-          if (state.screen !== "s-map") return;
-          const map = {
-            ArrowUp: [0, -1],
-            ArrowDown: [0, 1],
-            ArrowLeft: [-1, 0],
-            ArrowRight: [1, 0],
-            w: [0, -1],
-            s: [0, 1],
-            a: [-1, 0],
-            d: [1, 0],
-            W: [0, -1],
-            S: [0, 1],
-            A: [-1, 0],
-            D: [1, 0],
-          };
-          if (map[e.key]) {
-            e.preventDefault();
-            movePlayer(...map[e.key]);
+      function resize() {
+        W = window.innerWidth;
+        H = window.innerHeight;
+        ["map-canvas", "battle-canvas", "trans-bg", "go-bg"].forEach((id) => {
+          const c = document.getElementById(id);
+          if (c) {
+            c.width = W;
+            c.height = H;
           }
         });
+        const m = document.getElementById("menu-bg2");
+        if (m) {
+          m.width = W;
+          m.height = H;
+        }
+      }
+      resize();
+      window.addEventListener("resize", resize);
+
+      // ---- SCREENS ----
+      function show(id) {
+        document
+          .querySelectorAll(".scr")
+          .forEach((s) => s.classList.remove("on"));
+        document.getElementById(id).classList.add("on");
+        S.screen = id;
+      }
+
+      // ================================================================
+      // GAME OBJECT
+      // ================================================================
+      const Game = {
+        start() {
+          MelodyPlayer.init();
+          MelodyPlayer.playBGM();
+          S.stageIdx = 0;
+          S.score = 0;
+          S.lives = 3; // TAMBAHKAN INI
+          updateLivesDisplay();
+          S.hp = 3;
+          S.combo = 0;
+          S.ultiReady = false;
+          this.stageTransition(0);
+        },
+        showMenu() {
+          show("s-menu");
+          startMenuAnim();
+        },
+        showHelp() {
+          show("s-help");
+        },
+
+        stageTransition(idx) {
+          const st = STAGES[idx];
+          S.stageIdx = idx;
+          document.getElementById("t-num").textContent = `— STAGE ${st.id} —`;
+          document.getElementById("t-name").textContent = st.name;
+          document.getElementById("t-name").style.color = st.color;
+          document.getElementById("t-desc").textContent = st.desc;
+          document.getElementById("t-mobs").textContent = st.mobs
+            .map((m) => m.emoji)
+            .join(" ");
+          const btn = document.getElementById("t-btn");
+          btn.style.color = st.color;
+          btn.style.borderColor = st.color;
+          show("s-trans");
+          animTrans(st);
+        },
+
+        enterStage() {
+          if (mapRaf) {
+            cancelAnimationFrame(mapRaf);
+            mapRaf = null;
+          }
+          buildMap();
+          S.player = {
+            x: 1,
+            y: 1,
+            px: S.tS,
+            py: S.tS,
+            dir: 1,
+            walk: 0,
+            moving: false,
+          };
+          S.pBHp = S.pBMaxHp;
+          S.combo = 0;
+          S.ultiReady = false;
+          spawnMonsters();
+          S.mapParticles = [];
+          show("s-map");
+          mapLoop();
+        },
+
+        // ---- MAP MOVEMENT ----
+        movePlayer(dx, dy) {
+          MelodyPlayer.playNote(440, 0.05, 0, 0.15);
+          const nx = S.player.x + dx,
+            ny = S.player.y + dy;
+          if (nx < 0 || ny < 0 || nx >= S.mW || ny >= S.mH) return;
+          if (S.map[ny][nx] === 1) return;
+          S.player.x = nx;
+          S.player.y = ny;
+          if (dx !== 0) S.player.dir = dx > 0 ? 1 : -1;
+          S.player.moving = true;
+          S.player.walk += 0.4;
+          checkMonsters();
+        },
+        startMove(dx, dy) {
+          this.movePlayer(dx, dy);
+          clearInterval(S.moveInterval);
+          S.moveInterval = setInterval(() => this.movePlayer(dx, dy), 180);
+        },
+        stopMove() {
+          clearInterval(S.moveInterval);
+          S.player.moving = false;
+        },
 
         // ---- BATTLE ----
-        let battleAnimId = null;
-        let bParticles = [],
-          bProjectiles = [];
-        let bState = {
-          playerX: 100,
-          playerY: 380,
-          enemyX: 360,
-          enemyY: 250,
-          playerAnim: "idle",
-          enemyAnim: "idle",
-          playerAnimT: 0,
-          enemyAnimT: 0,
-          shake: 0,
-          enemyShake: 0,
-          domainRing: 0,
-          domainActive: false,
-          bgPulse: 0,
-        };
-
-        function triggerBattle(monster) {
-          if (state.inBattle) return;
-          state.inBattle = true;
-          state.currentMonster = monster;
-          state.enemyHp = monster.hp;
-          state.enemyMaxHp = monster.hp;
-          state.combo = 0;
-          state.ultiReady = false;
-          updateBattleUI();
+        triggerBattle(mon) {
+          MelodyPlayer.startBattle();
+          if (S.inBattle) return;
+          if (mapRaf) {
+            cancelAnimationFrame(mapRaf);
+            mapRaf = null;
+          }
+          S.inBattle = true;
+          S.curMon = mon;
+          S.eHp = mon.hp;
+          S.eMaxHp = mon.hp;
+          S.combo = 0;
+          S.ultiReady = false;
+          S.bParticles = [];
+          S.bProj = [];
+          S.bShake = 0;
+          S.eShake = 0;
+          S.domainActive = false;
+          S.domainR = 0;
+          show("s-battle");
+          updateBattleHUD();
           newQuestion();
-          showScreen("s-battle");
-          bParticles = [];
-          bProjectiles = [];
-          bState = {
-            playerX: 100,
-            playerY: 380,
-            enemyX: 360,
-            enemyY: 250,
-            playerAnim: "idle",
-            enemyAnim: "idle",
-            playerAnimT: 0,
-            enemyAnimT: 0,
-            shake: 0,
-            enemyShake: 0,
-            domainRing: 0,
-            domainActive: false,
-            bgPulse: 0,
-          };
-          startBattleLoop();
-        }
+          battleLoop();
+        },
 
-        function startBattleLoop() {
-          if (battleAnimId) cancelAnimationFrame(battleAnimId);
-          const c = document.getElementById("battle-canvas");
-          battleCtx = c.getContext("2d");
-          function loop() {
-            renderBattle();
-            battleAnimId = requestAnimationFrame(loop);
-          }
-          loop();
-        }
-
-        function renderBattle() {
-          const ctx = battleCtx;
-          const stage = STAGES[state.stageIdx];
-          const W = 480,
-            H = 700;
-          ctx.clearRect(0, 0, W, H);
-
-          // BG
-          ctx.fillStyle = stage.bg;
-          ctx.fillRect(0, 0, W, H);
-
-          // bg particles (ambient)
-          state.frameCount = (state.frameCount || 0) + 1;
-          if (state.frameCount % 3 === 0) {
-            bParticles.push({
-              x: Math.random() * W,
-              y: H + 10,
-              vx: (Math.random() - 0.5) * 0.5,
-              vy: -(0.5 + Math.random()),
-              life: 1,
-              decay: 0.005,
-              color: stage.color,
-              size: 1 + Math.random() * 2,
-              type: "ambient",
-            });
-          }
-
-          // domain effect
-          if (bState.domainActive) {
-            bState.domainRing += 3;
-            if (bState.domainRing > 300) {
-              bState.domainActive = false;
-              bState.domainRing = 0;
-            }
-            ctx.strokeStyle = "#00ccff";
-            ctx.lineWidth = 3;
-            ctx.globalAlpha = 1 - bState.domainRing / 300;
-            ctx.beginPath();
-            ctx.arc(W / 2, H / 2, bState.domainRing, 0, Math.PI * 2);
-            ctx.stroke();
-            ctx.beginPath();
-            ctx.arc(W / 2, H / 2, bState.domainRing * 0.6, 0, Math.PI * 2);
-            ctx.stroke();
-            ctx.globalAlpha = 1;
-            ctx.lineWidth = 1;
-            // domain overlay
-            const dGrad = ctx.createRadialGradient(
-              W / 2,
-              H / 2,
-              0,
-              W / 2,
-              H / 2,
-              300,
-            );
-            dGrad.addColorStop(0, "#0044ff11");
-            dGrad.addColorStop(0.5, "#00ccff08");
-            dGrad.addColorStop(1, "transparent");
-            ctx.fillStyle = dGrad;
-            ctx.fillRect(0, 0, W, H);
-          }
-
-          // bg shake
-          if (bState.shake > 0) {
-            ctx.translate(
-              Math.sin(bState.shake * 0.5) * (bState.shake * 0.3),
-              0,
-            );
-            bState.shake *= 0.8;
-          }
-          if (bState.enemyShake > 0) {
-          } // handled per draw
-
-          // draw floor line
-          ctx.strokeStyle = "#ffffff0a";
-          ctx.lineWidth = 1;
-          ctx.beginPath();
-          ctx.moveTo(0, 480);
-          ctx.lineTo(W, 480);
-          ctx.stroke();
-
-          // ENEMY
-          const m = state.currentMonster;
-          if (m) {
-            const ex =
-              bState.enemyX +
-              (bState.enemyShake > 0
-                ? Math.sin(Date.now() * 0.05) * bState.enemyShake
-                : 0);
-            const ey = bState.enemyY;
-            // enemy glow
-            const eGrad = ctx.createRadialGradient(ex, ey, 0, ex, ey, 80);
-            eGrad.addColorStop(0, m.color + "55");
-            eGrad.addColorStop(1, "transparent");
-            ctx.fillStyle = eGrad;
-            ctx.beginPath();
-            ctx.arc(ex, ey, 80, 0, Math.PI * 2);
-            ctx.fill();
-            // enemy sprite big
-            ctx.font = "80px serif";
-            ctx.textAlign = "center";
-            ctx.textBaseline = "middle";
-            const enemyBob = Math.sin(Date.now() * 0.002) * 6;
-            ctx.fillText(m.emoji, ex, ey + enemyBob);
-            if (bState.enemyShake > 0) bState.enemyShake *= 0.85;
-
-            // enemy elemental aura based on moves
-            if (m.moves.includes("magic")) {
-              for (let i = 0; i < 6; i++) {
-                const ang = Date.now() * 0.002 + (i * Math.PI) / 3;
-                const rx = ex + Math.cos(ang) * 55,
-                  ry = ey + Math.sin(ang) * 30;
-                ctx.beginPath();
-                ctx.arc(rx, ry, 5, 0, Math.PI * 2);
-                ctx.fillStyle = m.color + "88";
-                ctx.fill();
-              }
-            }
-            if (m.moves.includes("sword")) {
-              ctx.strokeStyle = m.color + "66";
-              ctx.lineWidth = 2;
-              ctx.beginPath();
-              ctx.moveTo(ex - 30, ey - 40);
-              ctx.lineTo(ex + 10, ey - 60);
-              ctx.stroke();
-              ctx.lineWidth = 1;
-            }
-            if (m.moves.includes("arrow")) {
-              ctx.fillStyle = m.color + "88";
-              ctx.fillRect(ex + 30, ey - 10, 20, 3);
-              ctx.beginPath();
-              ctx.moveTo(ex + 50, ey - 10 + 1.5);
-              ctx.lineTo(ex + 44, ey - 14);
-              ctx.lineTo(ex + 44, ey + 3);
-              ctx.fill();
-            }
-          }
-
-          // PLAYER
-          const px = bState.playerX;
-          const py = bState.playerY;
-          // blue aura
-          const pGrad = ctx.createRadialGradient(px, py, 0, px, py, 70);
-          pGrad.addColorStop(0, "#00ccff44");
-          pGrad.addColorStop(0.5, "#0044ff22");
-          pGrad.addColorStop(1, "transparent");
-          ctx.fillStyle = pGrad;
-          ctx.beginPath();
-          ctx.arc(px, py, 70, 0, Math.PI * 2);
-          ctx.fill();
-          // player sprite
-          ctx.font = "64px serif";
-          ctx.textAlign = "center";
-          ctx.textBaseline = "middle";
-          const playerBob = Math.sin(Date.now() * 0.003) * 4;
-          ctx.fillText("🧑", px, py + playerBob);
-          // blue ring orbit
-          for (let i = 0; i < 3; i++) {
-            const ang = Date.now() * 0.003 + (i * Math.PI * 2) / 3;
-            const rx = px + Math.cos(ang) * 45,
-              ry = py + Math.sin(ang) * 25;
-            ctx.beginPath();
-            ctx.arc(rx, ry, 5, 0, Math.PI * 2);
-            const ringGrad = ctx.createRadialGradient(rx, ry, 0, rx, ry, 5);
-            ringGrad.addColorStop(0, "#00ccff");
-            ringGrad.addColorStop(1, "#0044ff00");
-            ctx.fillStyle = ringGrad;
-            ctx.fill();
-          }
-          // blue energy ring
-          ctx.strokeStyle = "#00ccff33";
-          ctx.lineWidth = 2;
-          ctx.beginPath();
-          ctx.arc(
-            px,
-            py,
-            50 + Math.sin(Date.now() * 0.004) * 5,
-            0,
-            Math.PI * 2,
-          );
-          ctx.stroke();
-          ctx.lineWidth = 1;
-
-          // PROJECTILES
-          for (let i = bProjectiles.length - 1; i >= 0; i--) {
-            const p = bProjectiles[i];
-            p.x += p.vx;
-            p.y += p.vy;
-            p.life -= p.decay;
-            if (p.life <= 0) {
-              bProjectiles.splice(i, 1);
-              continue;
-            }
-            ctx.globalAlpha = p.life;
-            if (p.type === "blue_ball") {
-              const bg = ctx.createRadialGradient(
-                p.x,
-                p.y,
-                0,
-                p.x,
-                p.y,
-                p.size,
-              );
-              bg.addColorStop(0, "#ffffff");
-              bg.addColorStop(0.4, "#00ccff");
-              bg.addColorStop(1, "transparent");
-              ctx.fillStyle = bg;
-              ctx.beginPath();
-              ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-              ctx.fill();
-              // trail
-              ctx.beginPath();
-              ctx.arc(
-                p.x - p.vx * 2,
-                p.y - p.vy * 2,
-                p.size * 0.5,
-                0,
-                Math.PI * 2,
-              );
-              ctx.fillStyle = "#0066ff88";
-              ctx.fill();
-            } else if (p.type === "punch") {
-              ctx.fillStyle = "#00ccff";
-              ctx.font = `${Math.floor(p.size)}px serif`;
-              ctx.textAlign = "center";
-              ctx.fillText("👊", p.x, p.y);
-            } else if (p.type === "enemy_magic") {
-              const mg = ctx.createRadialGradient(
-                p.x,
-                p.y,
-                0,
-                p.x,
-                p.y,
-                p.size,
-              );
-              mg.addColorStop(0, "#ffffff");
-              mg.addColorStop(0.4, m ? m.color : "#ff4400");
-              mg.addColorStop(1, "transparent");
-              ctx.fillStyle = mg;
-              ctx.beginPath();
-              ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-              ctx.fill();
-            } else if (p.type === "ulti_ball") {
-              ctx.strokeStyle = "#00ccff";
-              ctx.lineWidth = 2;
-              ctx.beginPath();
-              ctx.arc(p.x, p.y, p.size * 1.5, 0, Math.PI * 2);
-              ctx.stroke();
-              const ug = ctx.createRadialGradient(
-                p.x,
-                p.y,
-                0,
-                p.x,
-                p.y,
-                p.size,
-              );
-              ug.addColorStop(0, "#ffffff");
-              ug.addColorStop(0.3, "#00ccff");
-              ug.addColorStop(0.7, "#0044ff");
-              ug.addColorStop(1, "transparent");
-              ctx.fillStyle = ug;
-              ctx.beginPath();
-              ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-              ctx.fill();
-            }
-            ctx.globalAlpha = 1;
-          }
-
-          // BATTLE PARTICLES
-          for (let i = bParticles.length - 1; i >= 0; i--) {
-            const p = bParticles[i];
-            p.x += p.vx;
-            p.y += p.vy;
-            p.life -= p.decay;
-            if (p.life <= 0) {
-              bParticles.splice(i, 1);
-              continue;
-            }
-            ctx.globalAlpha = p.life * 0.6;
-            ctx.beginPath();
-            ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-            ctx.fillStyle = p.color;
-            ctx.fill();
-            ctx.globalAlpha = 1;
-          }
-
-          ctx.setTransform(1, 0, 0, 1, 0, 0);
-        }
-
-        function newQuestion() {
-          const stage = STAGES[state.stageIdx];
-          const ops = stage.mathOps;
-          const op = ops[Math.floor(Math.random() * ops.length)];
-          const [lo, hi] = stage.mathRange;
-          let a, b, ans;
-          if (op === "+") {
-            a = lo + Math.floor(Math.random() * (hi - lo));
-            b = lo + Math.floor(Math.random() * (hi - lo));
-            ans = a + b;
-          } else if (op === "-") {
-            b = lo + Math.floor(Math.random() * (hi - lo));
-            a = b + lo + Math.floor(Math.random() * (hi - lo));
-            ans = a - b;
-          } else {
-            a = 2 + Math.floor(Math.random() * 9);
-            b = 2 + Math.floor(Math.random() * 9);
-            ans = a * b;
-          }
-          const typeMap = {
-            "+": "PENJUMLAHAN",
-            "-": "PENGURANGAN",
-            "×": "PERKALIAN",
-          };
-          document.getElementById("q-type").textContent = typeMap[op];
-          document.getElementById("q-text").textContent = `${a} ${op} ${b} = ?`;
-          state.correctAnswer = ans;
-          buildAnswerButtons(ans);
-        }
-
-        function buildAnswerButtons(correct) {
-          const row = document.getElementById("answer-row");
-          row.innerHTML = "";
-          const wrongs = new Set();
-          while (wrongs.size < 2) {
-            let w = correct + (Math.floor(Math.random() * 8) - 4);
-            if (w !== correct && w >= 0) wrongs.add(w);
-          }
-          const choices = [correct, ...wrongs].sort(() => Math.random() - 0.5);
-          choices.forEach((v) => {
-            const btn = document.createElement("button");
-            btn.className = "abtn";
-            btn.textContent = v;
-            btn.onclick = () => submitAnswer(v, btn);
-            row.appendChild(btn);
+        submitAnswer(val, btn) {
+          document.querySelectorAll(".abtn").forEach((b) => {
+            b.onclick = null;
+            b.disabled = true;
           });
-        }
+          const st = STAGES[S.stageIdx];
+          const dmg = Math.round(25 * (1 + S.stageIdx * 0.35));
 
-        function submitAnswer(val, btn) {
-          document.querySelectorAll(".abtn").forEach((b) => (b.onclick = null));
-          const stage = STAGES[state.stageIdx];
-          const dmgPerHit = 25 * (1 + state.stageIdx * 0.3);
-
-          if (val === state.correctAnswer) {
+          if (val === S.answer) {
+            MelodyPlayer.correct();
             btn.classList.add("correct");
-            // blue punch projectile
-            bProjectiles.push({
-              x: bState.playerX + 30,
-              y: bState.playerY,
-              vx: 8,
-              vy: -4,
+            // Blue punch projectile
+            S.bProj.push({
+              x: W * 0.22 + 60,
+              y: H * 0.42,
+              vx: 14,
+              vy: -6,
+              size: 18,
+              life: 1,
+              decay: 0.07,
+              type: "ball",
+            });
+            for (let i = 0; i < 20; i++)
+              S.bParticles.push({
+                x: W * 0.22,
+                y: H * 0.42,
+                vx: (Math.random() - 0.5) * 7,
+                vy: -Math.random() * 5,
+                life: 1,
+                decay: 0.035,
+                col: "#00ccff",
+                size: 3 + Math.random() * 5,
+              });
+            S.eHp = Math.max(0, S.eHp - dmg);
+            S.eShake = 12;
+            S.combo++;
+            const pct = Math.min(100, (S.combo / 3) * 100);
+            document.getElementById("ulti-fill").style.width = pct + "%";
+            document.getElementById("ulti-lbl").textContent =
+              `${Math.min(S.combo, 3)}/3`;
+            if (S.combo >= 3) {
+              S.ultiReady = true;
+              document.getElementById("ulti-btn").style.display = "block";
+              document.getElementById("ulti-lbl").textContent = "SIAP!";
+            }
+            showFB("+" + dmg + " DMG!", "fb-ok");
+            updateBattleHUD();
+            if (S.eHp <= 0) {
+              setTimeout(() => this.endBattle(true), 900);
+              return;
+            }
+            setTimeout(() => {
+              reEnableAnswers();
+              newQuestion();
+            }, 950);
+          } else {
+            MelodyPlayer.wrong();
+            MelodyPlayer.attack();
+            // JAWABAN SALAH - Musuh serang balik!
+            btn.classList.add("wrong");
+
+            // Hitung damage musuh (naik per stage)
+            const enemyDamage = Math.round(30 * (1 + S.stageIdx * 0.4));
+
+            // Efek visual
+            S.bShake = 14;
+            for (let i = 0; i < 20; i++)
+              S.bParticles.push({
+                x: W * 0.22,
+                y: H * 0.42,
+                vx: (Math.random() - 0.5) * 8,
+                vy: (Math.random() - 0.5) * 6,
+                life: 1,
+                decay: 0.04,
+                col: "#ff3344",
+                size: 3 + Math.random() * 4,
+              });
+
+            // Proyektil serangan musuh
+            S.bProj.push({
+              x: W * 0.78 - 60,
+              y: H * 0.38,
+              vx: -12,
+              vy: 4,
               size: 16,
               life: 1,
               decay: 0.06,
-              type: "blue_ball",
+              type: "enemy",
             });
-            // particles burst from player
-            for (let i = 0; i < 15; i++) {
-              bParticles.push({
-                x: bState.playerX,
-                y: bState.playerY,
-                vx: (Math.random() - 0.5) * 5,
-                vy: -Math.random() * 4,
-                life: 1,
-                decay: 0.04,
-                color: "#00ccff",
-                size: 3 + Math.random() * 4,
-                type: "hit",
-              });
-            }
-            state.enemyHp = Math.max(0, state.enemyHp - dmgPerHit);
-            bState.enemyShake = 8;
-            state.combo++;
-            const ultiPct = Math.min(100, (state.combo / 3) * 100);
-            document.getElementById("ulti-bar").style.width = ultiPct + "%";
-            document.getElementById("ulti-combo").textContent =
-              `${Math.min(state.combo, 3)}/3 combo`;
-            if (state.combo >= 3) {
-              state.ultiReady = true;
-              document.getElementById("ulti-btn").style.display = "block";
-              document.getElementById("ulti-combo").textContent = "ULTI SIAP!";
-            }
-            showFeedback("+" + Math.round(dmgPerHit) + " DMG!", "bf-correct");
-            if (state.enemyHp <= 0) {
-              setTimeout(() => endBattle(true), 800);
-            } else {
-              setTimeout(() => {
-                newQuestion();
-                enableAnswerButtons();
-              }, 900);
-            }
-          } else {
-            btn.classList.add("wrong");
-            const enemyAtk =
-              state.currentMonster.atk * (1 + state.stageIdx * 0.5);
-            state.playerBattleHp = Math.max(0, state.playerBattleHp - enemyAtk);
-            bState.shake = 10;
-            // enemy attacks back
-            const etype = state.currentMonster.moves[0];
-            bProjectiles.push({
-              x: bState.enemyX - 30,
-              y: bState.enemyY,
-              vx: -7,
-              vy: 3,
-              size: 14,
-              life: 1,
-              decay: 0.06,
-              type: "enemy_magic",
-            });
-            for (let i = 0; i < 10; i++) {
-              bParticles.push({
-                x: bState.playerX,
-                y: bState.playerY,
-                vx: (Math.random() - 0.5) * 6,
-                vy: (Math.random() - 0.5) * 4,
-                life: 1,
-                decay: 0.05,
-                color: "#ff3344",
-                size: 3 + Math.random() * 3,
-                type: "damage",
-              });
-            }
-            state.combo = 0;
-            document.getElementById("ulti-bar").style.width = "0%";
+
+            // Kurangi HP player battle
+            S.pBHp = Math.max(0, S.pBHp - enemyDamage);
+            updateBattleHUD();
+
+            showFB(`Serangan musuh! -${enemyDamage} HP!`, "fb-bad");
+
+            // Reset combo
+            S.combo = 0;
+            S.ultiReady = false;
+            document.getElementById("ulti-fill").style.width = "0%";
+            document.getElementById("ulti-lbl").textContent = "0/3";
             document.getElementById("ulti-btn").style.display = "none";
-            document.getElementById("ulti-combo").textContent = "0/3 combo";
-            state.ultiReady = false;
-            showFeedback("-" + Math.round(enemyAtk) + " HP!", "bf-wrong");
-            updateBattleUI();
-            if (state.playerBattleHp <= 0) {
-              state.hp--;
-              updateHUD();
-              if (state.hp <= 0) {
-                setTimeout(() => showGameOver(), 800);
-                return;
+
+            // Cek apakah player battle HP habis
+            if (S.pBHp <= 0) {
+              // Kurangi nyawa global
+              const isGameOver = reduceLife();
+
+              if (!isGameOver) {
+                // Reset HP battle ke full
+                S.pBHp = S.pBMaxHp;
+                updateBattleHUD();
+                showFB(`Nyawa tersisa: ${S.lives} ❤️`, "fb-ok");
               }
-              state.playerBattleHp = state.playerBattleMaxHp;
             }
+
+            // Lanjutkan battle dengan soal baru
             setTimeout(() => {
+              reEnableAnswers();
               newQuestion();
-              enableAnswerButtons();
-            }, 900);
+            }, 1200);
           }
-          updateBattleUI();
-        }
+        },
 
-        function enableAnswerButtons() {
-          document.querySelectorAll(".abtn").forEach((b) => {
-            b.classList.remove("correct", "wrong");
-            b.onclick = () => submitAnswer(parseInt(b.textContent), b);
-          });
-        }
-
-        function showFeedback(text, cls) {
-          const fb = document.getElementById("battle-feedback");
-          fb.textContent = text;
-          fb.className = "battle-feedback " + cls;
-          fb.style.opacity = "1";
-          setTimeout(() => (fb.style.opacity = "0"), 700);
-        }
-
-        function triggerUlti() {
-          if (!state.ultiReady) return;
-          state.ultiReady = false;
-          state.combo = 0;
+        ulti() {
+          MelodyPlayer.ulti();
+          if (!S.ultiReady) return;
+          S.ultiReady = false;
+          S.combo = 0;
           document.getElementById("ulti-btn").style.display = "none";
-          document.getElementById("ulti-bar").style.width = "0%";
-          document.getElementById("ulti-combo").textContent = "0/3 combo";
-          // domain expansion
-          bState.domainActive = true;
-          bState.domainRing = 0;
-          // big blue ball
-          const dmg = 25 * (1 + state.stageIdx * 0.3) * 3;
-          for (let i = 0; i < 5; i++) {
+          document.getElementById("ulti-fill").style.width = "0%";
+          document.getElementById("ulti-lbl").textContent = "0/3";
+          S.domainActive = true;
+          S.domainR = 0;
+          const dmg = Math.round(25 * (1 + S.stageIdx * 0.35) * 3);
+          for (let i = 0; i < 6; i++)
             setTimeout(() => {
-              bProjectiles.push({
-                x: bState.playerX + 30,
-                y: bState.playerY,
-                vx: 6 + i,
-                vy: -3 + i * 0.5,
-                size: 22,
+              S.bProj.push({
+                x: W * 0.22 + 40,
+                y: H * 0.42,
+                vx: 10 + i * 2,
+                vy: -4 + i * 0.8,
+                size: 24,
                 life: 1,
-                decay: 0.04,
-                type: "ulti_ball",
+                decay: 0.035,
+                type: "ulti",
               });
-            }, i * 120);
-          }
-          for (let i = 0; i < 30; i++) {
-            bParticles.push({
-              x: bState.playerX,
-              y: bState.playerY,
-              vx: (Math.random() - 0.5) * 8,
-              vy: -Math.random() * 6,
+            }, i * 130);
+          for (let i = 0; i < 40; i++)
+            S.bParticles.push({
+              x: W * 0.22,
+              y: H * 0.42,
+              vx: (Math.random() - 0.5) * 10,
+              vy: -Math.random() * 8,
               life: 1,
-              decay: 0.02,
-              color: i % 2 === 0 ? "#00ccff" : "#ffffff",
-              size: 4 + Math.random() * 5,
-              type: "ulti",
+              decay: 0.018,
+              col: i % 2 ? "#00ccff" : "#fff",
+              size: 4 + Math.random() * 6,
             });
-          }
-          showFeedback("⚡ DOMAIN CAHAYA! ×3!", "bf-ulti");
+          showFB("⚡ DOMAIN CAHAYA! ×3!", "fb-ulti");
           setTimeout(() => {
-            state.enemyHp = Math.max(0, state.enemyHp - dmg);
-            bState.enemyShake = 15;
-            updateBattleUI();
-            if (state.enemyHp <= 0) setTimeout(() => endBattle(true), 800);
+            S.eHp = Math.max(0, S.eHp - dmg);
+            S.eShake = 18;
+            updateBattleHUD();
+            if (S.eHp <= 0) setTimeout(() => this.endBattle(true), 900);
             else {
+              reEnableAnswers();
               newQuestion();
-              enableAnswerButtons();
             }
-          }, 800);
-        }
+          }, 900);
+        },
 
-        function updateBattleUI() {
-          const stage = STAGES[state.stageIdx];
-          document.getElementById("battle-stage-name").textContent = stage.name;
-          document.getElementById("battle-stage-name").innerHTML =
-            `${stage.name}<span>STAGE ${stage.id}</span>`;
-          document.getElementById("battle-score-val").textContent = state.score;
-          // HP bars
-          const pPct = Math.max(
-            0,
-            (state.playerBattleHp / state.playerBattleMaxHp) * 100,
-          );
-          const ePct = Math.max(0, (state.enemyHp / state.enemyMaxHp) * 100);
-          document.getElementById("player-hpbar").style.width = pPct + "%";
-          document.getElementById("enemy-hpbar").style.width = ePct + "%";
-          document.getElementById("player-hp-text").textContent =
-            `${Math.round(state.playerBattleHp)}/${state.playerBattleMaxHp}`;
-          document.getElementById("enemy-hp-text").textContent =
-            `${Math.round(state.enemyHp)}/${state.enemyMaxHp}`;
-          document.getElementById("enemy-name").textContent =
-            state.currentMonster ? state.currentMonster.name : "???";
-          updateHUD();
-        }
-
-        function endBattle(won) {
-          if (battleAnimId) {
-            cancelAnimationFrame(battleAnimId);
-            battleAnimId = null;
+        endBattle(won) {
+          if (battleRaf) {
+            cancelAnimationFrame(battleRaf);
+            battleRaf = null;
           }
-          state.inBattle = false;
+          S.inBattle = false;
           if (won) {
-            state.currentMonster.alive = false;
-            state.monstersKilled++;
-            state.score += 100 * (state.stageIdx + 1);
-            const alive = state.monsters.filter((m) => m.alive).length;
-            document.getElementById("hud-kills-val").textContent =
-              alive + " musuh";
-            showScreen("s-map");
-            startMapLoop();
+            S.curMon.alive = false;
+            S.score += 100 * (S.stageIdx + 1);
+            show("s-map");
+            mapLoop();
+            // Check all dead
+            const alive = S.monsters.filter((m) => m.alive).length;
+            if (alive === 0) {
+              S.lives = S.maxLives; // TAMBAHKAN INI
+              updateLivesDisplay();
+              setTimeout(() => {
+                if (S.stageIdx < STAGES.length - 1)
+                  this.stageTransition(S.stageIdx + 1);
+                else this.victory();
+              }, 1500);
+            }
           }
-        }
+        },
 
-        function showGameOver() {
-          if (battleAnimId) {
-            cancelAnimationFrame(battleAnimId);
-            battleAnimId = null;
+        gameOver(reason) {
+          MelodyPlayer.gameOver();
+          MelodyPlayer.stopBGM();
+          if (battleRaf) {
+            cancelAnimationFrame(battleRaf);
+            battleRaf = null;
           }
-          if (animFrame) {
-            cancelAnimationFrame(animFrame);
-            animFrame = null;
+          if (mapRaf) {
+            cancelAnimationFrame(mapRaf);
+            mapRaf = null;
           }
-          const stage = STAGES[state.stageIdx];
+          S.inBattle = false;
           document.getElementById("go-title").textContent = "GAME OVER";
           document.getElementById("go-title").style.color = "#ff3344";
           document.getElementById("go-emoji").textContent = "💀";
-          document.getElementById("go-score").textContent = state.score;
-          document.getElementById("go-sub").textContent =
-            `Gugur di ${stage.name}...`;
-          showScreen("s-gameover");
-          animateGameOver("#ff2200");
-        }
+          document.getElementById("go-score").textContent = S.score;
+          document.getElementById("go-reason").textContent =
+            reason || "Kamu gugur dalam pertempuran...";
+          show("s-go");
+          animGO("#cc0000");
+        },
 
-        function showVictory() {
-          if (battleAnimId) {
-            cancelAnimationFrame(battleAnimId);
-            battleAnimId = null;
+        victory() {
+          MelodyPlayer.victory();
+          MelodyPlayer.stopBGM();
+          if (battleRaf) {
+            cancelAnimationFrame(battleRaf);
+            battleRaf = null;
           }
-          if (animFrame) {
-            cancelAnimationFrame(animFrame);
-            animFrame = null;
+          if (mapRaf) {
+            cancelAnimationFrame(mapRaf);
+            mapRaf = null;
           }
           document.getElementById("go-title").textContent = "🏆 KEMENANGAN!";
           document.getElementById("go-title").style.color = "#ffd700";
           document.getElementById("go-emoji").textContent = "🌟";
-          document.getElementById("go-score").textContent = state.score;
-          document.getElementById("go-sub").textContent =
-            "Kamu menaklukkan semua 6 stage!";
-          showScreen("s-gameover");
-          animateGameOver("#ffd700");
+          document.getElementById("go-score").textContent = S.score;
+          document.getElementById("go-reason").textContent =
+            "Kamu menaklukkan semua 6 stage! Luar biasa!";
+          show("s-go");
+          animGO("#ffd700");
+        },
+      };
+
+      // ================================================================
+      // MAP GENERATION — ROOM-BASED
+      // ================================================================
+      function buildMap() {
+        // Fill all walls first
+        S.map = Array.from({ length: S.mH }, () => Array(S.mW).fill(1));
+
+        // Carve rooms (open rectangles)
+        const rooms = [];
+        function carveRoom(rx, ry, rw, rh) {
+          for (let y = ry; y < ry + rh; y++)
+            for (let x = rx; x < rx + rw; x++) S.map[y][x] = 0;
+          rooms.push({
+            cx: Math.floor(rx + rw / 2),
+            cy: Math.floor(ry + rh / 2),
+          });
+        }
+        function carveCorridor(x1, y1, x2, y2) {
+          let cx = x1,
+            cy = y1;
+          while (cx !== x2) {
+            S.map[cy][cx] = 0;
+            cx += cx < x2 ? 1 : -1;
+          }
+          while (cy !== y2) {
+            S.map[cy][cx] = 0;
+            cy += cy < y2 ? 1 : -1;
+          }
         }
 
-        function animateGameOver(color) {
-          const c = document.getElementById("go-canvas");
-          const ctx = c.getContext("2d");
-          let t = 0;
-          const pts = Array.from({ length: 50 }, () => ({
-            x: Math.random() * 480,
-            y: Math.random() * 700,
-            vx: (Math.random() - 0.5) * 2,
-            vy: -0.5 - Math.random(),
-            size: 2 + Math.random() * 4,
-            life: Math.random(),
-          }));
-          function loop() {
-            ctx.fillStyle = "rgba(0,0,0,0.15)";
-            ctx.fillRect(0, 0, 480, 700);
-            for (const p of pts) {
-              p.x += p.vx;
-              p.y += p.vy;
-              p.life -= 0.005;
-              if (p.life <= 0 || p.y < 0) {
-                p.y = 750;
-                p.x = Math.random() * 480;
-                p.life = 1;
+        // Fixed room layout — always traversable
+        const roomDefs = [
+          [1, 1, 5, 4], // spawn room
+          [8, 1, 6, 4],
+          [16, 1, 6, 4],
+          [24, 1, 6, 4],
+          [1, 7, 5, 4],
+          [8, 7, 7, 4],
+          [17, 7, 5, 4],
+          [24, 7, 5, 4],
+          [2, 14, 5, 4],
+          [9, 14, 6, 4],
+          [17, 14, 6, 4],
+          [24, 14, 6, 4],
+        ];
+        roomDefs.forEach(([rx, ry, rw, rh]) =>
+          carveRoom(
+            Math.min(rx, S.mW - 2),
+            Math.min(ry, S.mH - 2),
+            Math.min(rw, S.mW - rx - 1),
+            Math.min(rh, S.mH - ry - 1),
+          ),
+        );
+
+        // Connect rooms with corridors
+        for (let i = 1; i < rooms.length; i++)
+          carveCorridor(
+            rooms[i - 1].cx,
+            rooms[i - 1].cy,
+            rooms[i].cx,
+            rooms[i].cy,
+          );
+        // Extra connections
+        carveCorridor(rooms[0].cx, rooms[0].cy, rooms[4].cx, rooms[4].cy);
+        carveCorridor(rooms[3].cx, rooms[3].cy, rooms[7].cx, rooms[7].cy);
+        carveCorridor(rooms[8].cx, rooms[8].cy, rooms[4].cx, rooms[4].cy);
+        carveCorridor(rooms[11].cx, rooms[11].cy, rooms[7].cx, rooms[7].cy);
+
+        // Ensure spawn is open
+        S.map[1][1] = 0;
+        S.map[1][2] = 0;
+        S.map[2][1] = 0;
+        S.map[2][2] = 0;
+      }
+
+      function getOpenTiles(minDist = 4) {
+        const tiles = [];
+        for (let y = 0; y < S.mH; y++)
+          for (let x = 0; x < S.mW; x++)
+            if (
+              S.map[y][x] === 0 &&
+              Math.abs(x - S.player.x) + Math.abs(y - S.player.y) >= minDist
+            )
+              tiles.push({ x, y });
+        return tiles;
+      }
+
+      function spawnMonsters() {
+        const st = STAGES[S.stageIdx];
+        S.monsters = [];
+        const open = getOpenTiles(5);
+        for (let i = 0; i < st.count; i++) {
+          const mDef = st.mobs[i % st.mobs.length];
+          const tile = open[Math.floor(Math.random() * open.length)] || {
+            x: 10,
+            y: 10,
+          };
+          S.monsters.push({
+            ...mDef,
+            hp: mDef.hp,
+            maxHp: mDef.hp,
+            x: tile.x,
+            y: tile.y,
+            px: tile.x * S.tS,
+            py: tile.y * S.tS,
+            id: i,
+            alive: true,
+            aiT: 0,
+            phase: Math.random() * 6,
+          });
+        }
+        S.mTotal = st.count;
+        S.mKilled = 0;
+      }
+
+      function checkMonsters() {
+        for (const m of S.monsters) {
+          if (!m.alive) continue;
+          const d = Math.abs(m.x - S.player.x) + Math.abs(m.y - S.player.y);
+          if (d <= 1) {
+            Game.triggerBattle(m);
+            return;
+          }
+        }
+      }
+
+      function updateMonsterAI() {
+        const st = STAGES[S.stageIdx];
+        for (const m of S.monsters) {
+          if (!m.alive) continue;
+          m.aiT++;
+          if (m.aiT < 80) continue;
+          m.aiT = 0;
+          const dx = S.player.x - m.x,
+            dy = S.player.y - m.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          const aiLv = m.aiLv;
+          if (aiLv >= 3 && dist < 10) {
+            const hasTp = m.moves.includes("teleport");
+            const hasDash = m.moves.includes("dash");
+            if (hasTp && Math.random() < 0.4) {
+              const tiles = getOpenTiles(8);
+              const t = tiles[Math.floor(Math.random() * tiles.length)];
+              if (t) {
+                m.x = t.x;
+                m.y = t.y;
               }
-              ctx.globalAlpha = p.life * 0.6;
-              ctx.beginPath();
-              ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-              ctx.fillStyle = color;
-              ctx.fill();
-            }
-            ctx.globalAlpha = 1;
-            t++;
-            if (state.screen === "s-gameover") requestAnimationFrame(loop);
-          }
-          loop();
-        }
-
-        function updateHUD() {
-          const stage = STAGES[state.stageIdx] || STAGES[0];
-          // hearts
-          const hStr = Array.from(
-            { length: 5 },
-            (_, i) =>
-              `<div class="heart${i < state.hp ? "" : " empty"}"></div>`,
-          ).join("");
-          document.getElementById("hud-hearts").innerHTML = hStr;
-          document.getElementById("battle-hearts").innerHTML = hStr;
-          document.getElementById("hud-stage-name").innerHTML =
-            `${stage.name}<span>STAGE ${stage.id}</span>`;
-          document.getElementById("hud-score-val").textContent = state.score;
-        }
-
-        // ---- MENU ANIMATION ----
-        function animateMenu() {
-          const c = document.getElementById("menu-canvas");
-          const ctx = c.getContext("2d");
-          const pts = Array.from({ length: 80 }, () => ({
-            x: Math.random() * 480,
-            y: Math.random() * 700,
-            vx: (Math.random() - 0.5) * 0.4,
-            vy: -0.2 - Math.random() * 0.6,
-            size: 1 + Math.random() * 2.5,
-            life: Math.random(),
-            color: Math.random() > 0.5 ? "#00ccff" : "#4466ff",
-          }));
-          function loop() {
-            ctx.fillStyle = "rgba(0,0,0,0.05)";
-            ctx.fillRect(0, 0, 480, 700);
-            for (const p of pts) {
-              p.x += p.vx;
-              p.y += p.vy;
-              p.life -= 0.003;
-              if (p.life <= 0 || p.y < 0) {
-                p.y = 710;
-                p.x = Math.random() * 480;
-                p.life = 1;
+            } else if (hasDash && Math.random() < 0.45) {
+              const awx = Math.max(
+                1,
+                Math.min(S.mW - 2, m.x - (dx > 0 ? 2 : -2)),
+              );
+              const awy = Math.max(
+                1,
+                Math.min(S.mH - 2, m.y - (dy > 0 ? 2 : -2)),
+              );
+              if (S.map[awy][awx] === 0) {
+                m.x = awx;
+                m.y = awy;
               }
-              ctx.globalAlpha = p.life * 0.7;
-              ctx.beginPath();
-              ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-              ctx.fillStyle = p.color;
-              ctx.fill();
             }
-            ctx.globalAlpha = 1;
-            if (state.screen === "s-menu") requestAnimationFrame(loop);
-            else requestAnimationFrame(loop); // keep running always for menu returns
           }
-          loop();
+          // Random wander
+          if (Math.random() < 0.3) {
+            const dirs = [
+              [1, 0],
+              [-1, 0],
+              [0, 1],
+              [0, -1],
+            ];
+            const d2 = dirs[Math.floor(Math.random() * 4)];
+            const nx = m.x + d2[0],
+              ny = m.y + d2[1];
+            if (
+              nx > 0 &&
+              ny > 0 &&
+              nx < S.mW - 1 &&
+              ny < S.mH - 1 &&
+              S.map[ny][nx] === 0
+            ) {
+              m.x = nx;
+              m.y = ny;
+            }
+          }
+        }
+      }
 
-          // player preview
-          const pc = document.getElementById("player-preview-canvas");
-          const pctx = pc.getContext("2d");
-          function previewLoop() {
-            pctx.clearRect(0, 0, 80, 80);
-            const t = Date.now() * 0.003;
-            // glow
-            const g = pctx.createRadialGradient(40, 40, 0, 40, 40, 35);
-            g.addColorStop(0, "#00ccff44");
-            g.addColorStop(1, "transparent");
-            pctx.fillStyle = g;
-            pctx.beginPath();
-            pctx.arc(40, 40, 35, 0, Math.PI * 2);
-            pctx.fill();
-            // orbit
-            for (let i = 0; i < 3; i++) {
-              const a = t + (i * Math.PI * 2) / 3;
-              pctx.beginPath();
-              pctx.arc(
-                40 + Math.cos(a) * 28,
-                40 + Math.sin(a) * 16,
-                4,
-                0,
-                Math.PI * 2,
-              );
-              const rg = pctx.createRadialGradient(
-                40 + Math.cos(a) * 28,
-                40 + Math.sin(a) * 16,
-                0,
-                40 + Math.cos(a) * 28,
-                40 + Math.sin(a) * 16,
-                4,
-              );
-              rg.addColorStop(0, "#00ccff");
-              rg.addColorStop(1, "transparent");
-              pctx.fillStyle = rg;
-              pctx.fill();
-            }
-            pctx.font = `${32 + Math.sin(t) * 2}px serif`;
-            pctx.textAlign = "center";
-            pctx.textBaseline = "middle";
-            pctx.fillText("🧑", 40, 40 + Math.sin(t) * 3);
-            requestAnimationFrame(previewLoop);
+      // ================================================================
+      // MAP RENDERING
+      // ================================================================
+      function mapLoop() {
+        const c = document.getElementById("map-canvas");
+        c.width = W;
+        c.height = H;
+        mapCtx = c.getContext("2d");
+        let t = 0;
+        function loop() {
+          updateMonsterAI();
+          // Smooth player px/py
+          const ts = S.tS;
+          S.player.px += (S.player.x * ts - S.player.px) * 0.25;
+          S.player.py += (S.player.y * ts - S.player.py) * 0.25;
+          for (const m of S.monsters) {
+            if (!m.alive) continue;
+            m.px += (m.x * ts - m.px) * 0.18;
+            m.py += (m.y * ts - m.py) * 0.18;
           }
-          previewLoop();
+          S.player.walk += 0.06;
+          t++;
+          renderMap(t);
+          if (S.screen === "s-map") mapRaf = requestAnimationFrame(loop);
+        }
+        mapRaf = requestAnimationFrame(loop);
+      }
+
+      function renderMap(t) {
+        const ctx = mapCtx;
+        const st = STAGES[S.stageIdx];
+        ctx.clearRect(0, 0, W, H);
+        ctx.fillStyle = "#000";
+        ctx.fillRect(0, 0, W, H);
+
+        const ts = S.tS;
+        const camX = S.player.px + ts / 2 - W / 2;
+        const camY = S.player.py + ts / 2 - H / 2;
+
+        // TILES
+        const tx0 = Math.floor(camX / ts) - 1,
+          ty0 = Math.floor(camY / ts) - 1;
+        for (let ty = ty0; ty < ty0 + H / ts + 3; ty++) {
+          for (let tx = tx0; tx < tx0 + W / ts + 3; tx++) {
+            if (ty < 0 || ty >= S.mH || tx < 0 || tx >= S.mW) continue;
+            const sx = tx * ts - camX,
+              sy = ty * ts - camY;
+            if (S.map[ty][tx] === 1) {
+              // WALL — draw proper block with depth
+              ctx.fillStyle = st.wc;
+              ctx.fillRect(sx, sy, ts, ts);
+              // Top lighter face
+              ctx.fillStyle = "rgba(255,255,255,0.05)";
+              ctx.fillRect(sx, sy, ts, 4);
+              // Left lighter face
+              ctx.fillStyle = "rgba(255,255,255,0.03)";
+              ctx.fillRect(sx, sy, 3, ts);
+              // Dark shadow bottom/right
+              ctx.fillStyle = "rgba(0,0,0,0.4)";
+              ctx.fillRect(sx, sy + ts - 3, ts, 3);
+              ctx.fillRect(sx + ts - 3, sy, 3, ts);
+              // Subtle brick pattern
+              ctx.strokeStyle = "rgba(0,0,0,0.3)";
+              ctx.lineWidth = 0.5;
+              ctx.strokeRect(sx + 0.5, sy + 0.5, ts - 1, ts - 1);
+            } else {
+              // FLOOR
+              ctx.fillStyle = st.fc;
+              ctx.fillRect(sx, sy, ts, ts);
+              // Subtle tile lines
+              ctx.strokeStyle = "rgba(255,255,255,0.025)";
+              ctx.lineWidth = 0.5;
+              ctx.strokeRect(sx, sy, ts, ts);
+            }
+          }
         }
 
-        // ---- INIT ----
-        initState();
-        animateMenu();
+        // AMBIENT PARTICLES
+        if (t % 4 === 0 && S.mapParticles.length < 60)
+          S.mapParticles.push({
+            wx: S.player.x * ts + (Math.random() - 0.5) * 200,
+            wy: S.player.y * ts + (Math.random() - 0.5) * 200,
+            vx: (Math.random() - 0.5) * 0.3,
+            vy: -0.1 - Math.random() * 0.3,
+            life: 1,
+            decay: 0.008,
+            col: st.color,
+            size: 1 + Math.random() * 2,
+          });
+        for (let i = S.mapParticles.length - 1; i >= 0; i--) {
+          const p = S.mapParticles[i];
+          p.wx += p.vx;
+          p.wy += p.vy;
+          p.life -= p.decay;
+          if (p.life <= 0) {
+            S.mapParticles.splice(i, 1);
+            continue;
+          }
+          const sx = p.wx - camX,
+            sy = p.wy - camY;
+          ctx.globalAlpha = p.life * 0.5;
+          ctx.beginPath();
+          ctx.arc(sx, sy, p.size, 0, Math.PI * 2);
+          ctx.fillStyle = p.col;
+          ctx.fill();
+        }
+        ctx.globalAlpha = 1;
 
-        return {
-          showScreen,
-          startGame,
-          enterStage,
-          startMove,
-          stopMove,
-          triggerUlti,
+        // MONSTERS
+        for (const m of S.monsters) {
+          if (!m.alive) continue;
+          const sx = m.px - camX + ts / 2,
+            sy = m.py - camY + ts / 2;
+          m.phase += 0.04;
+          const bob = Math.sin(m.phase) * 3;
+          // Glow
+          const mg = ctx.createRadialGradient(
+            sx,
+            sy + bob,
+            0,
+            sx,
+            sy + bob,
+            ts * 1.2,
+          );
+          mg.addColorStop(0, m.col + "55");
+          mg.addColorStop(1, "transparent");
+          ctx.fillStyle = mg;
+          ctx.beginPath();
+          ctx.arc(sx, sy + bob, ts * 1.2, 0, Math.PI * 2);
+          ctx.fill();
+          // Draw RPG monster sprite (canvas-drawn)
+          drawMonsterSprite(
+            ctx,
+            sx,
+            sy + bob,
+            ts * 0.8,
+            m.col,
+            m.moves,
+            m.phase,
+          );
+          // Name tag
+          ctx.fillStyle = m.col + "cc";
+          ctx.font = "bold 10px Rajdhani,sans-serif";
+          ctx.textAlign = "center";
+          ctx.fillText(m.name, sx, sy + bob - ts * 0.8);
+        }
+
+        // PLAYER
+        const px = S.player.px - camX + ts / 2;
+        const py = S.player.py - camY + ts / 2;
+        // Blue aura
+        const pg = ctx.createRadialGradient(px, py, 0, px, py, ts * 2);
+        pg.addColorStop(0, "#00ccff44");
+        pg.addColorStop(0.4, "#0044ff22");
+        pg.addColorStop(1, "transparent");
+        ctx.fillStyle = pg;
+        ctx.beginPath();
+        ctx.arc(px, py, ts * 2, 0, Math.PI * 2);
+        ctx.fill();
+        // Orbiting blue rings
+        for (let i = 0; i < 3; i++) {
+          const ang = t * 0.04 + (i * Math.PI * 2) / 3;
+          const rx = px + Math.cos(ang) * ts * 0.9,
+            ry = py + Math.sin(ang) * ts * 0.5;
+          const rg = ctx.createRadialGradient(rx, ry, 0, rx, ry, 5);
+          rg.addColorStop(0, "#00ccff");
+          rg.addColorStop(1, "transparent");
+          ctx.fillStyle = rg;
+          ctx.beginPath();
+          ctx.arc(rx, ry, 5, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        // Draw RPG hero
+        drawHeroSprite(ctx, px, py, ts * 0.85, S.player.dir, S.player.walk, t);
+
+        // FOG OF WAR
+        const fogR = STAGES[S.stageIdx].fog;
+        const fg = ctx.createRadialGradient(
+          px,
+          py,
+          fogR * 0.5,
+          px,
+          py,
+          fogR * 1.4,
+        );
+        fg.addColorStop(0, "transparent");
+        fg.addColorStop(0.45, "rgba(0,0,0,0.55)");
+        fg.addColorStop(1, "rgba(0,0,0,0.98)");
+        ctx.fillStyle = fg;
+        ctx.fillRect(0, 0, W, H);
+        // Light flicker
+        ctx.globalAlpha = 0.03 * Math.abs(Math.sin(t * 0.03));
+        ctx.fillStyle = "#00ccff";
+        ctx.beginPath();
+        ctx.arc(px, py, fogR * 0.4, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.globalAlpha = 1;
+
+        // Tampilan nyawa di map
+        // Tampilan nyawa di map - pindahkan ke pojok kanan ATAS
+        ctx.fillStyle = "#ff6666";
+        ctx.font = "bold 13px Rajdhani,sans-serif";
+        ctx.textAlign = "right";
+        ctx.fillText(`❤️ ${S.lives}`, W - 20, 35);
+        ctx.textAlign = "right"; // rese
+
+        // HUD — alive count
+        const alive = S.monsters.filter((m) => m.alive).length;
+        ctx.font = "bold 13px Rajdhani,sans-serif";
+        ctx.fillStyle = "rgba(0,0,0,0.6)";
+        ctx.fillRect(14, H - 46, 240, 30);
+        ctx.fillStyle = STAGES[S.stageIdx].color + "cc";
+        ctx.textAlign = "left";
+        ctx.fillText(`👹 ${alive} musuh tersisa  |  ⭐ ${S.score}`, 20, H - 26);
+        // Stage name
+        ctx.textAlign = "center";
+        ctx.fillStyle = STAGES[S.stageIdx].color + "88";
+        ctx.font = "bold 11px Press Start 2P,monospace";
+        ctx.fillText(STAGES[S.stageIdx].name, W / 2, 24);
+
+        if (alive === 0 && !S.inBattle) {
+          ctx.fillStyle = "rgba(0,0,0,0.5)";
+          ctx.fillRect(W / 2 - 180, H / 2 - 30, 360, 60);
+          ctx.fillStyle = STAGES[S.stageIdx].color;
+          ctx.textAlign = "center";
+          ctx.font = "bold 14px Press Start 2P,monospace";
+          ctx.fillText("STAGE SELESAI!", W / 2, H / 2 + 6);
+        }
+      }
+
+      // ================================================================
+      // CHARACTER SPRITES (Canvas-drawn RPG style)
+      // ================================================================
+      function drawHeroSprite(ctx, x, y, size, dir, walk, t) {
+        const s = size;
+        const bob = Math.abs(Math.sin(walk)) * 3;
+        const legSwing = Math.sin(walk) * 8;
+        ctx.save();
+        ctx.translate(x, y - bob);
+        ctx.scale(dir, 1);
+
+        // Shadow
+        ctx.fillStyle = "rgba(0,0,0,0.3)";
+        ctx.beginPath();
+        ctx.ellipse(0, s * 0.55, s * 0.4, s * 0.1, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Legs
+        ctx.save();
+        ctx.translate(-s * 0.15, s * 0.25);
+        ctx.rotate(legSwing * 0.018);
+        ctx.fillStyle = "#3344aa";
+        ctx.fillRect(-s * 0.1, 0, s * 0.2, s * 0.32);
+        ctx.fillStyle = "#1a2266";
+        ctx.fillRect(-s * 0.12, s * 0.28, s * 0.24, s * 0.08);
+        ctx.restore();
+
+        ctx.save();
+        ctx.translate(s * 0.15, s * 0.25);
+        ctx.rotate(-legSwing * 0.018);
+        ctx.fillStyle = "#3344aa";
+        ctx.fillRect(-s * 0.1, 0, s * 0.2, s * 0.32);
+        ctx.fillStyle = "#1a2266";
+        ctx.fillRect(-s * 0.12, s * 0.28, s * 0.24, s * 0.08);
+        ctx.restore();
+
+        // Body — blue robe/armor
+        const bodyG = ctx.createLinearGradient(
+          -s * 0.28,
+          -s * 0.05,
+          s * 0.28,
+          s * 0.25,
+        );
+        bodyG.addColorStop(0, "#1155cc");
+        bodyG.addColorStop(0.5, "#0044aa");
+        bodyG.addColorStop(1, "#002266");
+        ctx.fillStyle = bodyG;
+        ctx.beginPath();
+        ctx.roundRect(-s * 0.28, -s * 0.05, s * 0.56, s * 0.32, s * 0.06);
+        ctx.fill();
+        // Armor trim
+        ctx.strokeStyle = "#00ccff88";
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(-s * 0.28, s * 0.05);
+        ctx.lineTo(s * 0.28, s * 0.05);
+        ctx.stroke();
+        // Blue glow chest
+        ctx.fillStyle = "#00ccff";
+        ctx.beginPath();
+        ctx.arc(0, s * 0.08, s * 0.06, 0, Math.PI * 2);
+        ctx.fill();
+        const cglow = ctx.createRadialGradient(
+          0,
+          s * 0.08,
+          0,
+          0,
+          s * 0.08,
+          s * 0.14,
+        );
+        cglow.addColorStop(0, "#00ccff66");
+        cglow.addColorStop(1, "transparent");
+        ctx.fillStyle = cglow;
+        ctx.beginPath();
+        ctx.arc(0, s * 0.08, s * 0.14, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Arms
+        ctx.save();
+        ctx.translate(-s * 0.3, s * 0.02);
+        ctx.rotate(-legSwing * 0.015 - 0.2);
+        ctx.fillStyle = "#1155cc";
+        ctx.fillRect(-s * 0.08, 0, s * 0.16, s * 0.26);
+        ctx.fillStyle = "#c0956a";
+        ctx.fillRect(-s * 0.07, s * 0.22, s * 0.14, s * 0.1);
+        ctx.restore();
+
+        // Sword arm (right)
+        ctx.save();
+        ctx.translate(s * 0.3, s * 0.02);
+        ctx.rotate(legSwing * 0.015 + 0.15);
+        ctx.fillStyle = "#1155cc";
+        ctx.fillRect(-s * 0.08, 0, s * 0.16, s * 0.26);
+        ctx.fillStyle = "#c0956a";
+        ctx.fillRect(-s * 0.07, s * 0.22, s * 0.14, s * 0.1);
+        // Sword
+        ctx.fillStyle = "#aaccee";
+        ctx.fillRect(s * 0.06, -s * 0.08, s * 0.06, s * 0.28);
+        ctx.fillStyle = "#ffd700";
+        ctx.fillRect(s * 0.03, s * 0.02, s * 0.12, s * 0.04);
+        ctx.fillStyle = "#00ccff88";
+        ctx.fillRect(s * 0.07, -s * 0.08, s * 0.04, s * 0.2);
+        ctx.restore();
+
+        // Head
+        const headG = ctx.createRadialGradient(
+          -s * 0.06,
+          -s * 0.26,
+          s * 0.02,
+          0,
+          -s * 0.22,
+          s * 0.18,
+        );
+        headG.addColorStop(0, "#f5d0a0");
+        headG.addColorStop(1, "#c07040");
+        ctx.fillStyle = headG;
+        ctx.beginPath();
+        ctx.arc(0, -s * 0.22, s * 0.18, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Hair
+        ctx.fillStyle = "#222";
+        ctx.beginPath();
+        ctx.arc(0, -s * 0.3, s * 0.16, Math.PI, 0);
+        ctx.fill();
+        ctx.fillRect(-s * 0.16, -s * 0.3, s * 0.05, s * 0.1);
+
+        // Helmet / headband with blue gem
+        ctx.fillStyle = "#1155cc";
+        ctx.fillRect(-s * 0.18, -s * 0.3, s * 0.36, s * 0.07);
+        ctx.fillStyle = "#00ccff";
+        ctx.beginPath();
+        ctx.arc(0, -s * 0.28, s * 0.05, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Eyes (Mata Kanan dan Kiri)
+        ctx.fillStyle = "white";
+        // Mata Kanan
+        ctx.beginPath();
+        ctx.ellipse(s * 0.06, -s * 0.21, s * 0.05, s * 0.06, 0, 0, Math.PI * 2);
+        ctx.fill();
+        // Mata Kiri
+        ctx.beginPath();
+        ctx.ellipse(
+          -s * 0.06,
+          -s * 0.21,
+          s * 0.05,
+          s * 0.06,
+          0,
+          0,
+          Math.PI * 2,
+        );
+        ctx.fill();
+
+        // Iris / Pupil (Mata Kanan) - center di dalam mata kanan
+        ctx.fillStyle = "#00aaff";
+        ctx.beginPath();
+        ctx.arc(s * 0.06, -s * 0.21, s * 0.025, 0, Math.PI * 2);
+        ctx.fill();
+        // Iris / Pupil (Mata Kiri) - center di dalam mata kiri
+        ctx.beginPath();
+        ctx.arc(-s * 0.06, -s * 0.21, s * 0.025, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Pupil dalam (Mata Kanan) - lebih kecil dan center
+        ctx.fillStyle = "#001133";
+        ctx.beginPath();
+        ctx.arc(s * 0.06, -s * 0.21, s * 0.012, 0, Math.PI * 2);
+        ctx.fill();
+        // Pupil dalam (Mata Kiri) - lebih kecil dan center
+        ctx.beginPath();
+        ctx.arc(-s * 0.06, -s * 0.21, s * 0.012, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Blue light emanating
+        ctx.globalAlpha = 0.12 + 0.08 * Math.sin(t * 0.08);
+        const glow = ctx.createRadialGradient(0, 0, 0, 0, 0, s);
+        glow.addColorStop(0, "#00ccff");
+        glow.addColorStop(1, "transparent");
+        ctx.fillStyle = glow;
+        ctx.beginPath();
+        ctx.arc(0, 0, s, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.globalAlpha = 1;
+
+        ctx.restore();
+      }
+
+      function drawMonsterSprite(ctx, x, y, size, col, moves, phase) {
+        const s = size;
+        ctx.save();
+        ctx.translate(x, y);
+
+        // Shadow
+        ctx.fillStyle = "rgba(0,0,0,0.3)";
+        ctx.beginPath();
+        ctx.ellipse(0, s * 0.55, s * 0.35, s * 0.09, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        const hasMagic = moves.includes("magic");
+        const hasSword = moves.includes("sword");
+        const hasArrow = moves.includes("arrow");
+        const hasTp = moves.includes("teleport");
+        const hasDash = moves.includes("dash");
+
+        // Body
+        const bodyG = ctx.createLinearGradient(
+          -s * 0.3,
+          -s * 0.1,
+          s * 0.3,
+          s * 0.3,
+        );
+        bodyG.addColorStop(0, col + "dd");
+        bodyG.addColorStop(1, col + "66");
+        ctx.fillStyle = bodyG;
+        ctx.beginPath();
+        ctx.roundRect(-s * 0.3, -s * 0.1, s * 0.6, s * 0.45, s * 0.08);
+        ctx.fill();
+        ctx.strokeStyle = col + "88";
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.roundRect(-s * 0.3, -s * 0.1, s * 0.6, s * 0.45, s * 0.08);
+        ctx.stroke();
+
+        // Head
+        ctx.fillStyle = col + "cc";
+        ctx.shadowBlur = 10;
+        ctx.shadowColor = col;
+        ctx.beginPath();
+        ctx.arc(0, -s * 0.2, s * 0.22, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+
+        // Eyes — glowing
+        ctx.fillStyle = "#000";
+        ctx.beginPath();
+        ctx.ellipse(
+          -s * 0.09,
+          -s * 0.22,
+          s * 0.06,
+          s * 0.08,
+          0,
+          0,
+          Math.PI * 2,
+        );
+        ctx.fill();
+        ctx.beginPath();
+        ctx.ellipse(s * 0.09, -s * 0.22, s * 0.06, s * 0.08, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = col;
+        ctx.shadowBlur = 8;
+        ctx.shadowColor = col;
+        ctx.beginPath();
+        ctx.arc(-s * 0.09, -s * 0.22, s * 0.03, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(s * 0.09, -s * 0.22, s * 0.03, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+
+        // Mouth — fangs
+        ctx.fillStyle = "#000";
+        ctx.beginPath();
+        ctx.ellipse(0, -s * 0.1, s * 0.1, s * 0.06, 0, 0, Math.PI);
+        ctx.fill();
+        ctx.fillStyle = "#eee";
+        ctx.beginPath();
+        ctx.moveTo(-s * 0.06, -s * 0.1);
+        ctx.lineTo(-s * 0.04, -s * 0.01);
+        ctx.lineTo(-s * 0.08, -s * 0.01);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.moveTo(s * 0.06, -s * 0.1);
+        ctx.lineTo(s * 0.04, -s * 0.01);
+        ctx.lineTo(s * 0.08, -s * 0.01);
+        ctx.fill();
+
+        // WEAPON based on moves
+        if (hasMagic) {
+          // Magic orb floating
+          const mang = phase * 1.5;
+          const mx = s * 0.5 * Math.cos(mang),
+            my = s * 0.3 * Math.sin(mang) - s * 0.1;
+          const mg2 = ctx.createRadialGradient(mx, my, 0, mx, my, s * 0.14);
+          mg2.addColorStop(0, "#ffffff");
+          mg2.addColorStop(0.5, col);
+          mg2.addColorStop(1, "transparent");
+          ctx.fillStyle = mg2;
+          ctx.shadowBlur = 15;
+          ctx.shadowColor = col;
+          ctx.beginPath();
+          ctx.arc(mx, my, s * 0.1, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.shadowBlur = 0;
+          // Orbit ring
+          ctx.strokeStyle = col + "44";
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.ellipse(0, -s * 0.1, s * 0.5, s * 0.3, 0, 0, Math.PI * 2);
+          ctx.stroke();
+        }
+        if (hasSword) {
+          // Big dark sword
+          ctx.save();
+          ctx.translate(s * 0.4, -s * 0.1);
+          ctx.rotate(0.4);
+          ctx.fillStyle = "#334455";
+          ctx.fillRect(-s * 0.05, -s * 0.4, s * 0.1, s * 0.5);
+          ctx.fillStyle = col + "88";
+          ctx.fillRect(-s * 0.04, -s * 0.38, s * 0.08, s * 0.46);
+          ctx.fillStyle = "#cc0000";
+          ctx.fillRect(-s * 0.12, -s * 0.15, s * 0.24, s * 0.05);
+          ctx.restore();
+        }
+        if (hasArrow) {
+          // Bow
+          ctx.save();
+          ctx.translate(-s * 0.42, -s * 0.05);
+          ctx.strokeStyle = col + "aa";
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.arc(0, 0, s * 0.22, -1.1, 1.1);
+          ctx.stroke();
+          ctx.strokeStyle = "#ccc";
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.moveTo(0, -s * 0.22);
+          ctx.lineTo(0, s * 0.22);
+          ctx.stroke();
+          // Arrow
+          ctx.fillStyle = "#ccc";
+          ctx.fillRect(-s * 0.25, -s * 0.03, s * 0.3, s * 0.04);
+          ctx.fillStyle = col;
+          ctx.beginPath();
+          ctx.moveTo(s * 0.05, -s * 0.06);
+          ctx.lineTo(s * 0.14, 0);
+          ctx.lineTo(s * 0.05, s * 0.06);
+          ctx.fill();
+          ctx.restore();
+        }
+        if (hasTp) {
+          // Teleport sparkles
+          for (let i = 0; i < 4; i++) {
+            const tang = phase * 2 + (i * Math.PI) / 2;
+            const tx2 = s * 0.7 * Math.cos(tang),
+              ty2 = s * 0.4 * Math.sin(tang) - s * 0.1;
+            ctx.fillStyle = col + "88";
+            ctx.globalAlpha = 0.5 + 0.5 * Math.sin(phase * 3 + i);
+            ctx.beginPath();
+            ctx.arc(tx2, ty2, s * 0.05, 0, Math.PI * 2);
+            ctx.fill();
+          }
+          ctx.globalAlpha = 1;
+        }
+
+        // Legs
+        const ls = Math.sin(phase * 2) * 5;
+        ctx.fillStyle = col + "88";
+        ctx.fillRect(-s * 0.22, s * 0.32, s * 0.16, s * 0.22);
+        ctx.fillRect(s * 0.06, s * 0.32, s * 0.16, s * 0.22);
+        ctx.fillStyle = "#111";
+        ctx.fillRect(-s * 0.24, s * 0.5, s * 0.18, s * 0.07);
+        ctx.fillRect(s * 0.06, s * 0.5, s * 0.18, s * 0.07);
+
+        ctx.restore();
+      }
+
+      // ================================================================
+      // BATTLE RENDERING
+      // ================================================================
+      function battleLoop() {
+        const c = document.getElementById("battle-canvas");
+        c.width = W;
+        c.height = H;
+        battleCtx = c.getContext("2d");
+        let t = 0;
+        function loop() {
+          t++;
+          renderBattle(t);
+          if (S.screen === "s-battle") battleRaf = requestAnimationFrame(loop);
+        }
+        battleRaf = requestAnimationFrame(loop);
+      }
+
+      function renderBattle(t) {
+        const ctx = battleCtx;
+        const st = STAGES[S.stageIdx];
+        const m = S.curMon;
+        ctx.clearRect(0, 0, W, H);
+        ctx.fillStyle = st.bg;
+        ctx.fillRect(0, 0, W, H);
+
+        // Ambient bg streaks
+        if (t % 5 === 0) {
+          S.bParticles.push({
+            x: Math.random() * W,
+            y: H + 10,
+            vx: (Math.random() - 0.5) * 0.8,
+            vy: -(0.4 + Math.random() * 1.2),
+            life: 1,
+            decay: 0.004,
+            col: st.color,
+            size: 1 + Math.random() * 2,
+          });
+        }
+
+        // Domain ring
+        if (S.domainActive) {
+          S.domainR += 4;
+          if (S.domainR > Math.max(W, H)) {
+            S.domainActive = false;
+            S.domainR = 0;
+          }
+          ctx.strokeStyle = "#00ccff";
+          ctx.lineWidth = 3;
+          ctx.globalAlpha = Math.max(0, 1 - S.domainR / 600);
+          ctx.beginPath();
+          ctx.arc(W * 0.22, H * 0.42, S.domainR, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.arc(W * 0.22, H * 0.42, S.domainR * 0.55, 0, Math.PI * 2);
+          ctx.stroke();
+          const dg = ctx.createRadialGradient(
+            W * 0.22,
+            H * 0.42,
+            0,
+            W * 0.22,
+            H * 0.42,
+            S.domainR,
+          );
+          dg.addColorStop(0, "#0044ff11");
+          dg.addColorStop(1, "transparent");
+          ctx.fillStyle = dg;
+          ctx.fillRect(0, 0, W, H);
+          ctx.globalAlpha = 1;
+          ctx.lineWidth = 1;
+        }
+
+        // Shake
+        if (S.bShake > 0) {
+          ctx.translate(Math.sin(t) * S.bShake * 0.5, 0);
+          S.bShake *= 0.8;
+        }
+        if (S.bShake < 0.2) S.bShake = 0;
+
+        // Floor line
+        ctx.strokeStyle = "#ffffff08";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(0, H * 0.68);
+        ctx.lineTo(W, H * 0.68);
+        ctx.stroke();
+
+        // ---- ENEMY ----
+        if (m) {
+          const ex =
+            W * 0.78 + (S.eShake > 0 ? Math.sin(t * 0.3) * S.eShake : 0);
+          const ey = H * 0.4;
+          if (S.eShake > 0) S.eShake *= 0.85;
+          // Big glow
+          const eg = ctx.createRadialGradient(ex, ey, 0, ex, ey, 120);
+          eg.addColorStop(0, m.col + "55");
+          eg.addColorStop(1, "transparent");
+          ctx.fillStyle = eg;
+          ctx.beginPath();
+          ctx.arc(ex, ey, 120, 0, Math.PI * 2);
+          ctx.fill();
+          // Draw monster large
+          ctx.save();
+          ctx.translate(ex, ey);
+          const sc = Math.min(W, H) * 0.0018;
+          ctx.scale(-sc, sc);
+          drawMonsterSprite(ctx, 0, 0, 80, m.col, m.moves, t * 0.03);
+          ctx.restore();
+          // HP indicator above
+          ctx.font = "bold 11px Press Start 2P,monospace";
+          ctx.fillStyle = m.col + "cc";
+          ctx.textAlign = "center";
+          ctx.fillText(m.name, ex, ey - 130);
+        }
+
+        // ---- HERO ----
+        const hx = W * 0.22,
+          hy = H * 0.5;
+        // Big glow
+        const hg = ctx.createRadialGradient(hx, hy, 0, hx, hy, 100);
+        hg.addColorStop(0, "#00ccff44");
+        hg.addColorStop(1, "transparent");
+        ctx.fillStyle = hg;
+        ctx.beginPath();
+        ctx.arc(hx, hy, 100, 0, Math.PI * 2);
+        ctx.fill();
+        // Orbit rings
+        for (let i = 0; i < 3; i++) {
+          const ang = t * 0.04 + (i * Math.PI * 2) / 3;
+          const rx = hx + Math.cos(ang) * 70,
+            ry = hy + Math.sin(ang) * 40;
+          const rg = ctx.createRadialGradient(rx, ry, 0, rx, ry, 6);
+          rg.addColorStop(0, "#00ccff");
+          rg.addColorStop(1, "transparent");
+          ctx.fillStyle = rg;
+          ctx.beginPath();
+          ctx.arc(rx, ry, 6, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.save();
+        ctx.translate(hx, hy);
+        const hsc = Math.min(W, H) * 0.0022;
+        ctx.scale(hsc, hsc);
+        drawHeroSprite(ctx, 0, 0, 80, 1, t * 0.06, t);
+        ctx.restore();
+
+        // ---- PROJECTILES ----
+        for (let i = S.bProj.length - 1; i >= 0; i--) {
+          const p = S.bProj[i];
+          p.x += p.vx * (W / 480);
+          p.y += p.vy * (H / 700);
+          p.life -= p.decay;
+          if (p.life <= 0) {
+            S.bProj.splice(i, 1);
+            continue;
+          }
+          ctx.globalAlpha = p.life;
+          if (p.type === "ball" || p.type === "ulti") {
+            const c = p.type === "ulti" ? "#ffffff" : "#00ccff";
+            const bg = ctx.createRadialGradient(
+              p.x,
+              p.y,
+              0,
+              p.x,
+              p.y,
+              p.size * (p.type === "ulti" ? 2 : 1),
+            );
+            bg.addColorStop(0, "#fff");
+            bg.addColorStop(0.4, c);
+            bg.addColorStop(1, "transparent");
+            ctx.fillStyle = bg;
+            ctx.shadowBlur = p.type === "ulti" ? 30 : 15;
+            ctx.shadowColor = c;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.shadowBlur = 0;
+            // Trail
+            ctx.beginPath();
+            ctx.arc(
+              p.x - p.vx * 2,
+              p.y - p.vy * 2,
+              p.size * 0.4,
+              0,
+              Math.PI * 2,
+            );
+            ctx.fillStyle = c + "66";
+            ctx.fill();
+          } else if (p.type === "enemy") {
+            const eg = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.size);
+            eg.addColorStop(0, "#fff");
+            eg.addColorStop(0.4, m ? m.col : "#ff4400");
+            eg.addColorStop(1, "transparent");
+            ctx.fillStyle = eg;
+            ctx.shadowBlur = 14;
+            ctx.shadowColor = m ? m.col : "#ff4400";
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.shadowBlur = 0;
+          }
+          ctx.globalAlpha = 1;
+        }
+
+        // ---- PARTICLES ----
+        for (let i = S.bParticles.length - 1; i >= 0; i--) {
+          const p = S.bParticles[i];
+          p.x += p.vx;
+          p.y += p.vy;
+          p.life -= p.decay;
+          if (p.life <= 0) {
+            S.bParticles.splice(i, 1);
+            continue;
+          }
+          ctx.globalAlpha = p.life * 0.7;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+          ctx.fillStyle = p.col;
+          ctx.fill();
+        }
+        ctx.globalAlpha = 1;
+
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+      }
+
+      // ================================================================
+      // BATTLE UI
+      // ================================================================
+      function newQuestion() {
+        const st = STAGES[S.stageIdx];
+        const op = st.ops[Math.floor(Math.random() * st.ops.length)];
+        const [lo, hi] = st.range;
+        let a, b, ans;
+        if (op === "+") {
+          a = lo + Math.floor(Math.random() * (hi - lo));
+          b = lo + Math.floor(Math.random() * (hi - lo));
+          ans = a + b;
+        } else if (op === "-") {
+          b = lo + Math.floor(Math.random() * (hi - lo));
+          a = b + lo + Math.floor(Math.random() * (hi - lo));
+          ans = a - b;
+        } else {
+          a = 2 + Math.floor(Math.random() * 9);
+          b = 2 + Math.floor(Math.random() * 9);
+          ans = a * b;
+        }
+        const map = {
+          "+": "PENJUMLAHAN",
+          "-": "PENGURANGAN",
+          "×": "PERKALIAN",
         };
+        document.getElementById("q-lbl").textContent = map[op];
+        document.getElementById("q-txt").textContent = `${a} ${op} ${b} = ?`;
+        S.answer = ans;
+        buildAnswers(ans);
+      }
+
+      function buildAnswers(correct) {
+        const grid = document.getElementById("ans-grid");
+        grid.innerHTML = "";
+        const ws = new Set();
+        while (ws.size < 2) {
+          let w = correct + (Math.floor(Math.random() * 10) - 5);
+          if (w !== correct && w >= 0) ws.add(w);
+        }
+        [...new Set([correct, ...ws])]
+          .sort(() => Math.random() - 0.5)
+          .forEach((v) => {
+            const b = document.createElement("button");
+            b.className = "abtn";
+            b.textContent = v;
+            b.onclick = () => Game.submitAnswer(v, b);
+            grid.appendChild(b);
+          });
+      }
+
+      function reEnableAnswers() {
+        document.querySelectorAll(".abtn").forEach((b) => {
+          b.classList.remove("correct", "wrong");
+          b.disabled = false;
+          const v = parseInt(b.textContent);
+          b.onclick = () => Game.submitAnswer(v, b);
+        });
+      }
+
+      function updateLivesDisplay() {
+        const livesEl = document.getElementById("lives-count");
+        if (livesEl) livesEl.textContent = S.lives;
+      }
+
+      function reduceLife() {
+        MelodyPlayer.lifeLost();
+        S.lives--;
+        updateLivesDisplay();
+
+        // Efek getaran layar
+        document.body.style.transform = "translateX(4px)";
+        setTimeout(() => (document.body.style.transform = ""), 100);
+
+        // Peringatan nyawa kritis
+        if (S.lives === 1) {
+          showFB("⚠️ PERINGATAN! Nyawa terakhir! ⚠️", "fb-bad");
+        }
+
+        if (S.lives <= 0) {
+          Game.gameOver("Nyawa habis! Petualangan berakhir...");
+          return true;
+        }
+        return false;
+      }
+
+      function addLife(amount = 1) {
+        S.lives = Math.min(S.maxLives, S.lives + amount);
+        updateLivesDisplay();
+      }
+
+      function updateBattleHUD() {
+        const pPct = Math.max(0, (S.pBHp / S.pBMaxHp) * 100);
+        const ePct = Math.max(0, (S.eHp / S.eMaxHp) * 100);
+        document.getElementById("p-hpbar").style.width = pPct + "%";
+        document.getElementById("e-hpbar").style.width = ePct + "%";
+        document.getElementById("p-hptext").textContent =
+          `${Math.round(S.pBHp)} / ${S.pBMaxHp}`;
+        document.getElementById("e-hptext").textContent =
+          `${Math.round(S.eHp)} / ${S.eMaxHp}`;
+        document.getElementById("e-name").textContent = S.curMon
+          ? S.curMon.name
+          : "???";
+      }
+
+      function showFB(text, cls) {
+        const fb = document.getElementById("battle-fb");
+        fb.textContent = text;
+        fb.className = "battle-fb " + cls;
+        fb.style.opacity = "1";
+        setTimeout(() => (fb.style.opacity = "0"), 800);
+      }
+
+      // ================================================================
+      // ANIMATIONS
+      // ================================================================
+      function animTrans(stage) {
+        const c = document.getElementById("trans-bg");
+        c.width = W;
+        c.height = H;
+        const ctx = c.getContext("2d");
+        let t = 0;
+        const pts = Array.from({ length: 60 }, () => ({
+          x: Math.random() * W,
+          y: Math.random() * H,
+          vx: (Math.random() - 0.5) * 0.6,
+          vy: -(0.3 + Math.random() * 0.8),
+          life: Math.random(),
+          decay: 0.003,
+          size: 1 + Math.random() * 3,
+        }));
+        function loop() {
+          ctx.fillStyle = "rgba(0,0,0,0.08)";
+          ctx.fillRect(0, 0, W, H);
+          for (const p of pts) {
+            p.x += p.vx;
+            p.y += p.vy;
+            p.life -= p.decay;
+            if (p.life <= 0 || p.y < 0) {
+              p.y = H + 10;
+              p.x = Math.random() * W;
+              p.life = 1;
+            }
+            ctx.globalAlpha = p.life * 0.5;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+            ctx.fillStyle = stage.color;
+            ctx.fill();
+          }
+          ctx.globalAlpha = 1;
+          t++;
+          if (S.screen === "s-trans") requestAnimationFrame(loop);
+        }
+        loop();
+      }
+
+      function animGO(col) {
+        const c = document.getElementById("go-bg");
+        c.width = W;
+        c.height = H;
+        const ctx = c.getContext("2d");
+        const pts = Array.from({ length: 60 }, () => ({
+          x: Math.random() * W,
+          y: Math.random() * H,
+          vx: (Math.random() - 0.5) * 1.5,
+          vy: -0.5 - Math.random() * 1.5,
+          life: Math.random(),
+          decay: 0.004,
+          size: 2 + Math.random() * 5,
+        }));
+        function loop() {
+          ctx.fillStyle = "rgba(0,0,0,0.12)";
+          ctx.fillRect(0, 0, W, H);
+          for (const p of pts) {
+            p.x += p.vx;
+            p.y += p.vy;
+            p.life -= p.decay;
+            if (p.life <= 0 || p.y < 0) {
+              p.y = H + 10;
+              p.x = Math.random() * W;
+              p.life = 1;
+            }
+            ctx.globalAlpha = p.life * 0.6;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+            ctx.fillStyle = col;
+            ctx.fill();
+          }
+          ctx.globalAlpha = 1;
+          if (S.screen === "s-go") requestAnimationFrame(loop);
+        }
+        loop();
+      }
+
+      function startMenuAnim() {
+        const c = document.getElementById("menu-bg2");
+        if (!c) return;
+        c.width = W;
+        c.height = H;
+        const ctx = c.getContext("2d");
+        const pts = Array.from({ length: 100 }, () => ({
+          x: Math.random() * W,
+          y: Math.random() * H,
+          vx: (Math.random() - 0.5) * 0.5,
+          vy: -0.2 - Math.random() * 0.7,
+          life: Math.random(),
+          decay: 0.003,
+          size: 1 + Math.random() * 3,
+          col: Math.random() > 0.5 ? "#00ccff" : "#0044ff",
+        }));
+        function loop() {
+          ctx.fillStyle = "rgba(0,0,0,0.04)";
+          ctx.fillRect(0, 0, W, H);
+          for (const p of pts) {
+            p.x += p.vx;
+            p.y += p.vy;
+            p.life -= p.decay;
+            if (p.life <= 0 || p.y < 0) {
+              p.y = H + 10;
+              p.x = Math.random() * W;
+              p.life = 1;
+            }
+            ctx.globalAlpha = p.life * 0.6;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+            ctx.fillStyle = p.col;
+            ctx.fill();
+          }
+          ctx.globalAlpha = 1;
+          if (S.screen === "s-menu" || S.screen === "menu")
+            requestAnimationFrame(loop);
+        }
+        loop();
+
+        // Hero preview
+        const hc = document.getElementById("hero-preview-canvas");
+        const hctx = hc.getContext("2d");
+        let ht = 0;
+        function heroLoop() {
+          hctx.clearRect(0, 0, 240, 340);
+          // bg glow
+          const bg = hctx.createRadialGradient(120, 190, 0, 120, 190, 110);
+          bg.addColorStop(0, "#00ccff22");
+          bg.addColorStop(1, "transparent");
+          hctx.fillStyle = bg;
+          hctx.fillRect(0, 0, 240, 340);
+          // hero big
+          hctx.save();
+          hctx.translate(120, 230);
+          drawHeroSprite(hctx, 0, 0, 100, 1, ht * 0.02, ht);
+          hctx.restore();
+          // name
+          hctx.font = "bold 11px Press Start 2P,monospace";
+          hctx.fillStyle = "#00ccff88";
+          hctx.textAlign = "center";
+          hctx.fillText("— MATH HERO —", 120, 310);
+          ht++;
+          requestAnimationFrame(heroLoop);
+        }
+        heroLoop();
+      }
+
+      // ================================================================
+      // SIMPLE MELODY PLAYER (Tanpa file eksternal)
+      // ================================================================
+      const MelodyPlayer = {
+        ctx: null,
+        muted: false,
+
+        init() {
+          if (this.ctx) return;
+          this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+        },
+
+        resume() {
+          if (this.ctx && this.ctx.state === "suspended") this.ctx.resume();
+        },
+
+        playNote(freq, duration, time = 0, volume = 0.3) {
+          if (this.muted || !this.ctx) return;
+          const now = this.ctx.currentTime + time;
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.type = "square";
+          osc.frequency.value = freq;
+          gain.gain.value = volume;
+          osc.start(now);
+          gain.gain.exponentialRampToValueAtTime(0.00001, now + duration);
+          osc.stop(now + duration);
+        },
+
+        // === MELODI BGM (Looping) ===
+        playBGM() {
+          if (this.bgmInterval) clearInterval(this.bgmInterval);
+          let step = 0;
+          const melody = [
+            { note: 262, dur: 0.4 }, // C4
+            { note: 294, dur: 0.4 }, // D4
+            { note: 330, dur: 0.4 }, // E4
+            { note: 349, dur: 0.4 }, // F4
+            { note: 392, dur: 0.4 }, // G4
+            { note: 440, dur: 0.4 }, // A4
+            { note: 494, dur: 0.4 }, // B4
+            { note: 523, dur: 0.8 }, // C5
+            { note: 494, dur: 0.4 },
+            { note: 440, dur: 0.4 },
+            { note: 392, dur: 0.4 },
+            { note: 349, dur: 0.4 },
+            { note: 330, dur: 0.4 },
+            { note: 294, dur: 0.4 },
+            { note: 262, dur: 0.8 },
+          ];
+
+          this.bgmInterval = setInterval(() => {
+            if (!this.muted && this.ctx) {
+              const m = melody[step % melody.length];
+              this.playNote(m.note, m.dur, 0, 0.15);
+              step++;
+            }
+          }, 500);
+        },
+
+        stopBGM() {
+          if (this.bgmInterval) {
+            clearInterval(this.bgmInterval);
+            this.bgmInterval = null;
+          }
+        },
+
+        // SFX
+        correct() {
+          this.playNote(880, 0.15, 0, 0.4);
+          setTimeout(() => this.playNote(1046, 0.2, 0, 0.4), 120);
+        },
+
+        wrong() {
+          this.playNote(440, 0.2, 0, 0.5);
+          setTimeout(() => this.playNote(330, 0.3, 0, 0.4), 180);
+        },
+
+        attack() {
+          this.playNote(196, 0.2, 0, 0.45);
+          setTimeout(() => this.playNote(174, 0.15, 0, 0.4), 150);
+        },
+
+        ulti() {
+          [1318, 1568, 1760, 2093].forEach((f, i) => {
+            setTimeout(() => this.playNote(f, 0.3, 0, 0.5), i * 150);
+          });
+        },
+
+        lifeLost() {
+          this.playNote(262, 0.25, 0, 0.5);
+          setTimeout(() => this.playNote(196, 0.3, 0, 0.5), 200);
+        },
+
+        gameOver() {
+          [440, 392, 349, 330].forEach((f, i) => {
+            setTimeout(() => this.playNote(f, 0.4, 0, 0.5), i * 300);
+          });
+        },
+
+        victory() {
+          [523, 659, 784, 1046, 1046].forEach((f, i) => {
+            setTimeout(() => this.playNote(f, 0.3, 0, 0.5), i * 200);
+          });
+        },
+
+        startBattle() {
+          this.playNote(660, 0.1, 0, 0.3);
+          setTimeout(() => this.playNote(880, 0.15, 0, 0.3), 100);
+        },
+
+        toggleMute() {
+          this.muted = !this.muted;
+          const btn = document.getElementById("sound-toggle");
+          if (btn) btn.innerHTML = this.muted ? "🔇 SOUND OFF" : "🔊 SOUND ON";
+          if (!this.muted && this.ctx) this.playBGM();
+          if (this.muted) this.stopBGM();
+        },
+      };
+
+      // ========== MOBILE ORIENTATION DETECTION (UPDATED) ==========
+      (function () {
+        // Create rotate warning element
+        const rotateDiv = document.createElement("div");
+        rotateDiv.className = "rotate-device";
+        rotateDiv.innerHTML = `
+    <div class="rotate-icon">🔄</div>
+    <div>PUTAR PONSEL</div>
+    <div style="font-size: 12px; margin-top: 10px;">Gunakan mode landscape</div>
+    <div style="font-size: 10px; margin-top: 20px;">⬅️➡️</div>
+  `;
+        document.body.appendChild(rotateDiv);
+
+        function checkOrientation() {
+          if (window.innerHeight > window.innerWidth) {
+            // Portrait mode
+            document.body.classList.add("portrait");
+            document.body.classList.remove("landscape");
+          } else {
+            // Landscape mode
+            document.body.classList.add("landscape");
+            document.body.classList.remove("portrait");
+
+            // Resize canvas after orientation change
+            setTimeout(() => {
+              resize();
+              updateAnalogVisibility();
+              if (window.mapLoop) {
+                // Refresh map if active
+                const c = document.getElementById("map-canvas");
+                if (c && c.width !== window.innerWidth) {
+                  c.width = window.innerWidth;
+                  c.height = window.innerHeight;
+                }
+                const bc = document.getElementById("battle-canvas");
+                if (bc && bc.width !== window.innerWidth) {
+                  bc.width = window.innerWidth;
+                  bc.height = window.innerHeight;
+                }
+              }
+            }, 100);
+          }
+          updateAnalogVisibility();
+        }
+
+        // Check on load
+        checkOrientation();
+
+        // Check on resize
+        window.addEventListener("resize", checkOrientation);
+
+        // Also check on orientation change
+        window.addEventListener("orientationchange", function () {
+          setTimeout(checkOrientation, 50);
+        });
       })();
+      // ========== UPDATE BODY CLASS FOR MAP SCREEN ==========
+      // Modifikasi fungsi show untuk menambahkan class ke body
+      const originalShow = show;
+      show = function (id) {
+        originalShow(id);
+
+        // Update body class based on active screen
+        if (id === "s-map") {
+          document.body.classList.add("map-active");
+        } else {
+          document.body.classList.remove("map-active");
+        }
+
+        // Also update analog stick visibility based on screen
+        const analogStick = document.getElementById("analog-stick");
+        if (analogStick) {
+          if (
+            id === "s-map" &&
+            window.innerWidth <= 768 &&
+            window.innerHeight < window.innerWidth
+          ) {
+            analogStick.style.display = "block";
+          } else {
+            analogStick.style.display = "none";
+          }
+        }
+
+        const hintDiv = document.querySelector(".mobile-controls-hint");
+        if (hintDiv) {
+          if (
+            id === "s-map" &&
+            window.innerWidth <= 768 &&
+            window.innerHeight < window.innerWidth
+          ) {
+            hintDiv.style.display = "block";
+          } else {
+            hintDiv.style.display = "none";
+          }
+        }
+      };
+
+      // Modifikasi fungsi checkOrientation untuk update analog visibility
+      const originalCheckOrientation = window.checkOrientation;
+      function updateAnalogVisibility() {
+        const analogStick = document.getElementById("analog-stick");
+        const hintDiv = document.querySelector(".mobile-controls-hint");
+        const isMapActive = S.screen === "s-map";
+        const isMobileLandscape =
+          window.innerWidth <= 768 && window.innerHeight < window.innerWidth;
+
+        if (analogStick) {
+          analogStick.style.display =
+            isMapActive && isMobileLandscape ? "block" : "none";
+        }
+        if (hintDiv) {
+          hintDiv.style.display =
+            isMapActive && isMobileLandscape ? "block" : "none";
+        }
+      }
+
+      // Update orientation check function
+      function enhancedCheckOrientation() {
+        if (window.innerHeight > window.innerWidth) {
+          document.body.classList.add("portrait");
+          document.body.classList.remove("landscape");
+        } else {
+          document.body.classList.add("landscape");
+          document.body.classList.remove("portrait");
+
+          setTimeout(() => {
+            resize();
+            updateAnalogVisibility();
+            if (window.mapLoop) {
+              const c = document.getElementById("map-canvas");
+              if (c && c.width !== window.innerWidth) {
+                c.width = window.innerWidth;
+                c.height = window.innerHeight;
+              }
+              const bc = document.getElementById("battle-canvas");
+              if (bc && bc.width !== window.innerWidth) {
+                bc.width = window.innerWidth;
+                bc.height = window.innerHeight;
+              }
+            }
+          }, 100);
+        }
+        updateAnalogVisibility();
+      }
+
+      // Override the orientation check
+      window.enhancedCheckOrientation = enhancedCheckOrientation;
+
+      // ========== VIRTUAL ANALOG STICK FIXED ==========
+      (function () {
+        // Hapus yang sudah ada jika ada
+        const existingStick = document.getElementById("analog-stick");
+        if (existingStick) existingStick.remove();
+        const existingHint = document.querySelector(".mobile-controls-hint");
+        if (existingHint) existingHint.remove();
+
+        // Create analog stick container
+        const analogStick = document.createElement("div");
+        analogStick.id = "analog-stick";
+        analogStick.innerHTML = `
+    <div class="analog-base">
+      <div class="analog-thumb"></div>
+    </div>
+  `;
+        document.body.appendChild(analogStick);
+
+        // Add styles for analog stick
+        const analogStyles = document.createElement("style");
+        analogStyles.textContent = `
+    #analog-stick {
+      position: fixed;
+      bottom: 80px;
+      left: 80px;
+      width: 120px;
+      height: 120px;
+      z-index: 10000;
+      display: none;
+      touch-action: none;
+    }
+    
+    .analog-base {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      border: 2px solid #00ccff;
+      border-radius: 50%;
+      backdrop-filter: blur(4px);
+      box-shadow: 0 0 20px rgba(0, 204, 255, 0.3);
+    }
+    
+    .analog-thumb {
+      position: absolute;
+      width: 50px;
+      height: 50px;
+      background: #00ccff;
+      border-radius: 50%;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      transition: all 0.05s ease-out;
+      box-shadow: 0 0 15px #00ccff;
+      cursor: pointer;
+    }
+    
+    .mobile-controls-hint {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: rgba(0,0,0,0.7);
+      padding: 8px 12px;
+      border-radius: 20px;
+      font-size: 10px;
+      color: #00ccff;
+      font-family: monospace;
+      z-index: 10000;
+      display: none;
+      pointer-events: none;
+      border: 1px solid #00ccff44;
+    }
+    
+    @media (max-width: 768px) and (orientation: landscape) {
+      #analog-stick {
+        display: block !important;
+      }
+      .mobile-controls-hint {
+        display: block !important;
+      }
+    }
+    
+    /* Hide analog when not on map */
+    body:not(.map-active) #analog-stick {
+      display: none !important;
+    }
+    body:not(.map-active) .mobile-controls-hint {
+      display: none !important;
+    }
+  `;
+        document.head.appendChild(analogStyles);
+
+        // Add hint text
+        const hintDiv = document.createElement("div");
+        hintDiv.className = "mobile-controls-hint";
+        hintDiv.innerHTML = "🎮 Geser joystick untuk bergerak";
+        document.body.appendChild(hintDiv);
+
+        let active = false;
+        let baseX = 0,
+          baseY = 0;
+        let moveInterval = null;
+        let lastDirection = { dx: 0, dy: 0 };
+        let touchId = null;
+
+        const thumb = analogStick.querySelector(".analog-thumb");
+        const maxDist = 40;
+
+        function updateThumbPosition(clientX, clientY) {
+          const rect = analogStick.getBoundingClientRect();
+          if (!rect.width) return;
+
+          // Calculate position relative to center
+          let dx = clientX - (rect.left + rect.width / 2);
+          let dy = clientY - (rect.top + rect.height / 2);
+          const dist = Math.sqrt(dx * dx + dy * dy);
+
+          if (dist > maxDist) {
+            dx = (dx / dist) * maxDist;
+            dy = (dy / dist) * maxDist;
+          }
+
+          // Update thumb position
+          thumb.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`;
+
+          // Calculate direction (with deadzone)
+          let dirX = 0,
+            dirY = 0;
+          const deadzone = 12;
+          if (Math.abs(dx) > deadzone) dirX = dx > 0 ? 1 : -1;
+          if (Math.abs(dy) > deadzone) dirY = dy > 0 ? 1 : -1;
+
+          // Send movement if direction changed
+          if (lastDirection.dx !== dirX || lastDirection.dy !== dirY) {
+            lastDirection = { dx: dirX, dy: dirY };
+
+            // Stop current movement
+            if (moveInterval) {
+              clearInterval(moveInterval);
+              moveInterval = null;
+            }
+
+            // Start new movement if direction exists
+            if ((dirX !== 0 || dirY !== 0) && S.screen === "s-map") {
+              // Initial move
+              if (typeof Game !== "undefined" && Game.movePlayer) {
+                Game.movePlayer(dirX, dirY);
+              }
+              // Continuous move
+              moveInterval = setInterval(() => {
+                if (
+                  typeof Game !== "undefined" &&
+                  Game.movePlayer &&
+                  S.screen === "s-map"
+                ) {
+                  Game.movePlayer(dirX, dirY);
+                }
+              }, 150);
+            } else {
+              // Stop movement
+              if (typeof Game !== "undefined" && Game.stopMove) {
+                Game.stopMove();
+              }
+            }
+          }
+        }
+
+        function resetThumb() {
+          thumb.style.transform = "translate(-50%, -50%)";
+          active = false;
+          touchId = null;
+          lastDirection = { dx: 0, dy: 0 };
+          if (moveInterval) {
+            clearInterval(moveInterval);
+            moveInterval = null;
+          }
+          if (typeof Game !== "undefined" && Game.stopMove) {
+            Game.stopMove();
+          }
+        }
+
+        // Touch events with better handling
+        analogStick.addEventListener("touchstart", (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          if (S.screen !== "s-map") return;
+
+          const touch = e.touches[0];
+          if (!touch) return;
+
+          touchId = touch.identifier;
+          active = true;
+
+          // Get initial position
+          const rect = analogStick.getBoundingClientRect();
+          baseX = rect.left + rect.width / 2;
+          baseY = rect.top + rect.height / 2;
+
+          updateThumbPosition(touch.clientX, touch.clientY);
+        });
+
+        analogStick.addEventListener("touchmove", (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          if (!active || S.screen !== "s-map") return;
+
+          // Find the touch we're tracking
+          let touch = null;
+          for (let i = 0; i < e.touches.length; i++) {
+            if (e.touches[i].identifier === touchId) {
+              touch = e.touches[i];
+              break;
+            }
+          }
+          if (!touch) return;
+
+          updateThumbPosition(touch.clientX, touch.clientY);
+        });
+
+        analogStick.addEventListener("touchend", (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          resetThumb();
+        });
+
+        analogStick.addEventListener("touchcancel", (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          resetThumb();
+        });
+
+        // Mouse support for testing on desktop
+        let mouseActive = false;
+        let mouseMoveHandler = null;
+        let mouseUpHandler = null;
+
+        analogStick.addEventListener("mousedown", (e) => {
+          e.preventDefault();
+          if (S.screen !== "s-map") return;
+
+          mouseActive = true;
+          const rect = analogStick.getBoundingClientRect();
+          baseX = rect.left + rect.width / 2;
+          baseY = rect.top + rect.height / 2;
+
+          updateThumbPosition(e.clientX, e.clientY);
+
+          mouseMoveHandler = (moveEvent) => {
+            if (!mouseActive) return;
+            updateThumbPosition(moveEvent.clientX, moveEvent.clientY);
+          };
+
+          mouseUpHandler = () => {
+            mouseActive = false;
+            resetThumb();
+            document.removeEventListener("mousemove", mouseMoveHandler);
+            document.removeEventListener("mouseup", mouseUpHandler);
+          };
+
+          document.addEventListener("mousemove", mouseMoveHandler);
+          document.addEventListener("mouseup", mouseUpHandler);
+        });
+
+        // Update visibility when screen changes
+        function updateAnalogStickVisibility() {
+          const isMap = S.screen === "s-map";
+          const isMobileLandscape =
+            window.innerWidth <= 768 && window.innerHeight < window.innerWidth;
+
+          if (isMap && isMobileLandscape) {
+            analogStick.style.display = "block";
+            hintDiv.style.display = "block";
+          } else {
+            analogStick.style.display = "none";
+            hintDiv.style.display = "none";
+          }
+        }
+
+        // Override show function to update analog visibility
+        const originalShowFunction = window.show || show;
+        window.show = function (id) {
+          if (originalShowFunction) originalShowFunction(id);
+          S.screen = id;
+          setTimeout(updateAnalogStickVisibility, 50);
+        };
+
+        // Also update on orientation change
+        window.addEventListener("resize", () => {
+          setTimeout(updateAnalogStickVisibility, 100);
+        });
+
+        // Initial update
+        setTimeout(updateAnalogStickVisibility, 100);
+
+        // Expose function to update visibility
+        window.updateAnalogStickVisibility = updateAnalogStickVisibility;
+      })();
+      // ================================================================
+      // INPUT
+      // ================================================================
+      document.addEventListener("keydown", (e) => {
+        if (S.screen !== "s-map") return;
+        const m = {
+          ArrowUp: [0, -1],
+          ArrowDown: [0, 1],
+          ArrowLeft: [-1, 0],
+          ArrowRight: [1, 0],
+          w: [0, -1],
+          s: [0, 1],
+          a: [-1, 0],
+          d: [1, 0],
+          W: [0, -1],
+          S: [0, 1],
+          A: [-1, 0],
+          D: [1, 0],
+        };
+        if (m[e.key]) {
+          e.preventDefault();
+          Game.startMove(...m[e.key]);
+        }
+      });
+      document.addEventListener("keyup", (e) => {
+        if (S.screen !== "s-map") return;
+        const mv = [
+          "ArrowUp",
+          "ArrowDown",
+          "ArrowLeft",
+          "ArrowRight",
+          "w",
+          "s",
+          "a",
+          "d",
+          "W",
+          "S",
+          "A",
+          "D",
+        ];
+        if (mv.includes(e.key)) Game.stopMove();
+      });
+
+      // ================================================================
+      // INIT
+      // ================================================================
+      S.screen = "menu";
+      startMenuAnim();
+
+      // Pastikan class map-active terupdate saat ganti screen
+      const originalShowFunction2 = show;
+      show = function (id) {
+        originalShowFunction2(id);
+        if (id === "s-map") {
+          document.body.classList.add("map-active");
+        } else {
+          document.body.classList.remove("map-active");
+        }
+        // Update analog visibility
+        if (window.updateAnalogStickVisibility) {
+          setTimeout(window.updateAnalogStickVisibility, 50);
+        }
+      };
     </script>
   </body>
 </html>

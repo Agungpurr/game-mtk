@@ -1,0 +1,2546 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>⚔️ Petualangan Matematika — RPG</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        background: #000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        font-family: "Rajdhani", sans-serif;
+        overflow: hidden;
+      }
+      #app {
+        width: 480px;
+        height: 700px;
+        position: relative;
+        overflow: hidden;
+        border-radius: 12px;
+        box-shadow:
+          0 0 60px #004488aa,
+          0 0 120px #002244aa;
+      }
+      canvas {
+        display: block;
+      }
+      .screen {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: none;
+        flex-direction: column;
+      }
+      .screen.active {
+        display: flex;
+      }
+
+      /* ===MENU=== */
+      #s-menu {
+        background: #000;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+      }
+      #menu-canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+      }
+      .menu-content {
+        position: relative;
+        z-index: 10;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 16px;
+      }
+      .menu-logo {
+        font-family: "Press Start 2P", monospace;
+        font-size: 11px;
+        color: #00ccff;
+        text-shadow:
+          0 0 20px #00ccff,
+          0 0 40px #0066ff;
+        line-height: 2.2;
+        letter-spacing: 3px;
+      }
+      .menu-logo span {
+        color: #fff;
+        font-size: 8px;
+        display: block;
+        color: #88aaff;
+      }
+      .menu-player-preview {
+        position: relative;
+        width: 80px;
+        height: 80px;
+        margin: 8px auto;
+      }
+      .menu-btns {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        width: 240px;
+      }
+      .mbtn {
+        padding: 12px 20px;
+        border: 1px solid;
+        border-radius: 6px;
+        font-family: "Orbitron", monospace;
+        font-size: 11px;
+        font-weight: 700;
+        cursor: pointer;
+        letter-spacing: 1px;
+        transition: all 0.2s;
+        background: transparent;
+      }
+      .mbtn-start {
+        border-color: #00ccff;
+        color: #00ccff;
+        box-shadow:
+          0 0 10px #00ccff44,
+          inset 0 0 10px #00ccff11;
+      }
+      .mbtn-start:hover {
+        background: #00ccff22;
+        box-shadow: 0 0 20px #00ccff88;
+      }
+      .mbtn-info {
+        border-color: #8844ff;
+        color: #8844ff;
+      }
+      .mbtn-info:hover {
+        background: #8844ff22;
+      }
+
+      /* ===HUD=== */
+      .hud {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 52px;
+        z-index: 100;
+        padding: 8px 12px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: linear-gradient(180deg, #000c 0%, transparent 100%);
+      }
+      .hud-hp {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .hud-hp-label {
+        font-size: 11px;
+        color: #ff4466;
+        font-weight: 700;
+        font-family: "Orbitron", monospace;
+      }
+      .hp-hearts {
+        display: flex;
+        gap: 3px;
+      }
+      .heart {
+        width: 14px;
+        height: 14px;
+        background: #ff3355;
+        clip-path: polygon(50% 90%, 5% 35%, 20% 10%, 50% 30%, 80% 10%, 95% 35%);
+        transition: all 0.3s;
+      }
+      .heart.empty {
+        background: #331122;
+        box-shadow: none;
+      }
+      .hud-stage {
+        font-family: "Press Start 2P", monospace;
+        font-size: 7px;
+        color: #ffaa00;
+        text-align: center;
+      }
+      .hud-stage span {
+        display: block;
+        font-size: 6px;
+        color: #886600;
+        margin-top: 2px;
+      }
+      .hud-score {
+        font-family: "Orbitron", monospace;
+        font-size: 11px;
+        color: #00ffaa;
+        text-align: right;
+      }
+      .hud-score span {
+        display: block;
+        font-size: 8px;
+        color: #006644;
+      }
+      .combo-bar {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: #00ccff;
+        transform-origin: left;
+        transition: transform 0.5s;
+      }
+
+      /* ===MAP=== */
+      #s-map {
+        background: #000;
+      }
+      #map-canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+      }
+      .map-hud {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+      }
+      .dpad {
+        position: absolute;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: grid;
+        grid-template-columns: repeat(3, 44px);
+        grid-template-rows: repeat(3, 44px);
+        gap: 4px;
+        z-index: 50;
+      }
+      .dpad-btn {
+        border-radius: 8px;
+        border: 1px solid #ffffff22;
+        background: #ffffff0a;
+        color: #fff;
+        font-size: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        user-select: none;
+        -webkit-user-select: none;
+      }
+      .dpad-btn:active {
+        background: #00ccff33;
+        border-color: #00ccff;
+      }
+      .dpad-center {
+        opacity: 0;
+        pointer-events: none;
+      }
+      .encounter-flash {
+        position: absolute;
+        inset: 0;
+        background: #ff220044;
+        z-index: 200;
+        pointer-events: none;
+        border-radius: 12px;
+        opacity: 0;
+        transition: opacity 0.3s;
+      }
+
+      /* ===BATTLE=== */
+      #s-battle {
+        background: #000;
+      }
+      #battle-canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+      }
+      .battle-ui {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 12px;
+        z-index: 50;
+        background: linear-gradient(0deg, #000f 0%, transparent 100%);
+      }
+      .question-box {
+        background: #000d;
+        border: 1px solid #00ccff44;
+        border-radius: 10px;
+        padding: 14px 16px;
+        margin-bottom: 10px;
+        position: relative;
+        overflow: hidden;
+      }
+      .question-box::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, #00ccff, transparent);
+      }
+      .q-type {
+        font-size: 10px;
+        color: #00ccff88;
+        font-family: "Orbitron", monospace;
+        letter-spacing: 2px;
+        margin-bottom: 6px;
+      }
+      .q-text {
+        font-family: "Press Start 2P", monospace;
+        font-size: 20px;
+        color: #fff;
+        text-align: center;
+        text-shadow: 0 0 10px #00ccff;
+      }
+      .answer-row {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+        margin-bottom: 8px;
+      }
+      .abtn {
+        padding: 13px 8px;
+        border-radius: 8px;
+        border: 1px solid #4466ff66;
+        background: #0a0a2a;
+        color: #8899ff;
+        font-size: 17px;
+        font-weight: 700;
+        cursor: pointer;
+        font-family: "Rajdhani", sans-serif;
+        transition: all 0.15s;
+        text-align: center;
+      }
+      .abtn:hover {
+        border-color: #00ccff;
+        color: #00ccff;
+        background: #00001a;
+        box-shadow: 0 0 12px #00ccff44;
+      }
+      .abtn.correct {
+        border-color: #00ff88;
+        background: #002211;
+        color: #00ff88;
+        animation: pulse-green 0.4s;
+      }
+      .abtn.wrong {
+        border-color: #ff3344;
+        background: #220011;
+        color: #ff3344;
+        animation: shake 0.3s;
+      }
+      .battle-info-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 12px;
+        color: #556677;
+        padding: 0 2px;
+      }
+      .ulti-bar-wrap {
+        height: 6px;
+        background: #111;
+        border-radius: 3px;
+        flex: 1;
+        margin: 0 10px;
+        overflow: hidden;
+      }
+      .ulti-bar {
+        height: 100%;
+        background: linear-gradient(90deg, #0044ff, #00ccff, #ffffff);
+        border-radius: 3px;
+        transition: width 0.4s;
+        width: 0%;
+      }
+      .ulti-ready {
+        color: #00ccff;
+        font-family: "Orbitron", monospace;
+        font-size: 9px;
+        animation: glow-pulse 1s infinite alternate;
+        cursor: pointer;
+      }
+      @keyframes glow-pulse {
+        from {
+          text-shadow: 0 0 4px #00ccff;
+        }
+        to {
+          text-shadow:
+            0 0 16px #00ccff,
+            0 0 30px #0088ff;
+        }
+      }
+      @keyframes pulse-green {
+        0%,
+        100% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.1);
+        }
+      }
+      @keyframes shake {
+        0%,
+        100% {
+          transform: translateX(0);
+        }
+        25% {
+          transform: translateX(-5px);
+        }
+        75% {
+          transform: translateX(5px);
+        }
+      }
+
+      /* ===HP BARS IN BATTLE=== */
+      .battle-bars {
+        position: absolute;
+        top: 56px;
+        left: 0;
+        right: 0;
+        padding: 0 12px;
+        z-index: 50;
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+      }
+      .bbar-wrap {
+        flex: 1;
+      }
+      .bbar-name {
+        font-size: 10px;
+        font-family: "Orbitron", monospace;
+        font-weight: 700;
+        margin-bottom: 3px;
+      }
+      .bbar-name.player {
+        color: #00ccff;
+      }
+      .bbar-name.enemy {
+        color: #ff4455;
+        text-align: right;
+      }
+      .bbar-outer {
+        height: 8px;
+        background: #111;
+        border-radius: 4px;
+        overflow: hidden;
+        border: 1px solid #ffffff11;
+      }
+      .bbar-inner {
+        height: 100%;
+        border-radius: 4px;
+        transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      .bbar-inner.player {
+        background: linear-gradient(90deg, #0044aa, #00ccff);
+      }
+      .bbar-inner.enemy {
+        background: linear-gradient(90deg, #ff2244, #ff8800);
+      }
+      .bbar-hp-text {
+        font-size: 9px;
+        margin-top: 2px;
+        color: #556677;
+        font-family: "Orbitron", monospace;
+      }
+      .bbar-hp-text.enemy {
+        text-align: right;
+      }
+
+      /* ===FEEDBACK=== */
+      .battle-feedback {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-family: "Press Start 2P", monospace;
+        font-size: 16px;
+        pointer-events: none;
+        z-index: 200;
+        opacity: 0;
+        transition: opacity 0.3s;
+        white-space: nowrap;
+      }
+      .bf-correct {
+        color: #00ff88;
+        text-shadow: 0 0 20px #00ff88;
+      }
+      .bf-wrong {
+        color: #ff3344;
+        text-shadow: 0 0 20px #ff3344;
+      }
+      .bf-ulti {
+        color: #00ccff;
+        text-shadow:
+          0 0 30px #00ccff,
+          0 0 60px #0066ff;
+        font-size: 12px;
+      }
+
+      /* ===STAGE TRANSITION=== */
+      #s-transition {
+        background: #000;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+      }
+      .trans-content {
+        z-index: 10;
+        position: relative;
+      }
+      .trans-stage-num {
+        font-family: "Press Start 2P", monospace;
+        font-size: 9px;
+        color: #666;
+        margin-bottom: 8px;
+        letter-spacing: 3px;
+      }
+      .trans-title {
+        font-family: "Orbitron", monospace;
+        font-size: 22px;
+        font-weight: 900;
+        margin-bottom: 8px;
+      }
+      .trans-desc {
+        font-size: 14px;
+        color: #889;
+        margin-bottom: 24px;
+        line-height: 1.6;
+      }
+      .trans-enemies-preview {
+        display: flex;
+        justify-content: center;
+        gap: 12px;
+        margin-bottom: 24px;
+        font-size: 36px;
+      }
+      #trans-canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+      }
+      .trans-btn {
+        padding: 12px 32px;
+        border: 1px solid currentColor;
+        border-radius: 6px;
+        background: transparent;
+        font-family: "Orbitron", monospace;
+        font-size: 11px;
+        font-weight: 700;
+        cursor: pointer;
+        letter-spacing: 1px;
+        transition: all 0.2s;
+      }
+
+      /* ===GAMEOVER / WIN=== */
+      #s-gameover {
+        background: #000;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        flex-direction: column;
+        gap: 16px;
+      }
+      .go-title {
+        font-family: "Press Start 2P", monospace;
+        font-size: 18px;
+        letter-spacing: 4px;
+      }
+      .go-score {
+        font-family: "Orbitron", monospace;
+        font-size: 28px;
+        font-weight: 900;
+        margin: 8px 0;
+      }
+      .go-sub {
+        font-size: 14px;
+        color: #778;
+      }
+
+      /* ===INFO=== */
+      #s-info {
+        background: #050510;
+        padding: 20px;
+        overflow-y: auto;
+      }
+      .info-title {
+        font-family: "Press Start 2P", monospace;
+        font-size: 9px;
+        color: #00ccff;
+        margin-bottom: 16px;
+        text-align: center;
+        letter-spacing: 2px;
+      }
+      .info-section {
+        margin-bottom: 14px;
+        border-left: 2px solid #00ccff44;
+        padding-left: 12px;
+      }
+      .info-section h3 {
+        font-family: "Orbitron", monospace;
+        font-size: 11px;
+        color: #00ccff;
+        margin-bottom: 6px;
+      }
+      .info-section p {
+        font-size: 13px;
+        color: #99aabb;
+        line-height: 1.6;
+      }
+      .info-back {
+        margin-top: 16px;
+        padding: 10px;
+        border: 1px solid #4466ff;
+        background: transparent;
+        border-radius: 6px;
+        color: #4466ff;
+        font-family: "Orbitron", monospace;
+        font-size: 10px;
+        cursor: pointer;
+        width: 100%;
+        letter-spacing: 1px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app">
+      <!-- ===MENU=== -->
+      <div class="screen active" id="s-menu">
+        <canvas id="menu-canvas" width="480" height="700"></canvas>
+        <div class="menu-content">
+          <div class="menu-logo">
+            ⚔ MATH LEGEND ⚔<span>RPG EDUKASI MATEMATIKA</span>
+          </div>
+          <canvas
+            id="player-preview-canvas"
+            width="80"
+            height="80"
+            style="position: relative; z-index: 10"
+          ></canvas>
+          <div class="menu-btns">
+            <button class="mbtn mbtn-start" onclick="G.startGame()">
+              ▶ MULAI PETUALANGAN
+            </button>
+            <button class="mbtn mbtn-info" onclick="G.showScreen('s-info')">
+              📖 PETUNJUK
+            </button>
+          </div>
+          <div
+            style="
+              font-size: 10px;
+              color: #334455;
+              font-family: &quot;Orbitron&quot;, monospace;
+              margin-top: 8px;
+            "
+          >
+            v2.0 — 6 STAGE
+          </div>
+        </div>
+      </div>
+
+      <!-- ===INFO=== -->
+      <div class="screen" id="s-info">
+        <div style="padding: 20px; overflow-y: auto; height: 100%">
+          <div class="info-title">📖 CARA BERMAIN</div>
+          <div class="info-section">
+            <h3>🗺️ LABIRIN</h3>
+            <p>
+              Jelajahi labirin gelap! Kamu hanya bisa melihat area sekitar
+              dirimu. Temukan monster untuk bertarung. WASD / tombol arah untuk
+              bergerak.
+            </p>
+          </div>
+          <div class="info-section">
+            <h3>⚔️ BATTLE</h3>
+            <p>
+              Jawab soal matematika dengan benar untuk menyerang musuh. Setiap
+              jawaban benar = 25 damage (naik per stage). Jawaban salah = kena
+              serangan musuh!
+            </p>
+          </div>
+          <div class="info-section">
+            <h3>✨ ULTI — DOMAIN CAHAYA</h3>
+            <p>
+              Jawab benar 3x berturut-turut → ulti bar penuh → klik ULTI! → bola
+              cahaya biru explode ke semua musuh 3× damage!
+            </p>
+          </div>
+          <div class="info-section">
+            <h3>👹 MONSTER AI</h3>
+            <p>
+              Monster makin cerdas di stage tinggi: Teleport menjauh, Dash
+              kabur, menyerang lebih keras, darah 2× lipat setiap stage!
+            </p>
+          </div>
+          <div class="info-section">
+            <h3>🏟️ 6 STAGE</h3>
+            <p>
+              Sekolah Gelap → Hutan → Luar Angkasa → Neraka → Lautan → Lahar.
+              Tiap stage makin brutal!
+            </p>
+          </div>
+          <div class="info-section">
+            <h3>💙 KEKUATAN CAHAYA BIRU</h3>
+            <p>
+              Pukulan cahaya biru = benar! Domain = ulti 3x combo! Kalahkan
+              semua monster di labirin untuk ke stage berikutnya.
+            </p>
+          </div>
+          <button class="info-back" onclick="G.showScreen('s-menu')">
+            ⬅ KEMBALI
+          </button>
+        </div>
+      </div>
+
+      <!-- ===STAGE TRANSITION=== -->
+      <div class="screen" id="s-transition">
+        <canvas id="trans-canvas" width="480" height="700"></canvas>
+        <div class="trans-content">
+          <div class="trans-stage-num" id="trans-stage-num">STAGE 1</div>
+          <div class="trans-title" id="trans-title" style="color: #00ccff">
+            SEKOLAH GELAP
+          </div>
+          <div class="trans-desc" id="trans-desc">
+            Koridor sepi... cahaya mati...<br />monster bersembunyi di balik
+            kegelapan.
+          </div>
+          <div class="trans-enemies-preview" id="trans-enemies"></div>
+          <button
+            class="trans-btn"
+            id="trans-btn"
+            onclick="G.enterStage()"
+            style="color: #00ccff; border-color: #00ccff"
+          >
+            MASUK ▶
+          </button>
+        </div>
+      </div>
+
+      <!-- ===MAP=== -->
+      <div class="screen" id="s-map">
+        <canvas id="map-canvas" width="480" height="700"></canvas>
+        <div class="map-hud">
+          <div class="hud">
+            <div class="hud-hp">
+              <div class="hud-hp-label">HP</div>
+              <div class="hp-hearts" id="hud-hearts"></div>
+            </div>
+            <div class="hud-stage" id="hud-stage-name">
+              SEKOLAH GELAP<span>STAGE 1</span>
+            </div>
+            <div class="hud-score">
+              ⭐ <span id="hud-score-val">0</span
+              ><span id="hud-kills-val">0 musuh</span>
+            </div>
+          </div>
+        </div>
+        <div class="encounter-flash" id="enc-flash"></div>
+        <div class="dpad">
+          <div></div>
+          <div
+            class="dpad-btn"
+            id="dbtn-up"
+            onpointerdown="G.startMove(0,-1)"
+            onpointerup="G.stopMove()"
+          >
+            ▲
+          </div>
+          <div></div>
+          <div
+            class="dpad-btn"
+            id="dbtn-left"
+            onpointerdown="G.startMove(-1,0)"
+            onpointerup="G.stopMove()"
+          >
+            ◀
+          </div>
+          <div class="dpad-center"></div>
+          <div
+            class="dpad-btn"
+            id="dbtn-right"
+            onpointerdown="G.startMove(1,0)"
+            onpointerup="G.stopMove()"
+          >
+            ▶
+          </div>
+          <div></div>
+          <div
+            class="dpad-btn"
+            id="dbtn-down"
+            onpointerdown="G.startMove(0,1)"
+            onpointerup="G.stopMove()"
+          >
+            ▼
+          </div>
+          <div></div>
+        </div>
+      </div>
+
+      <!-- ===BATTLE=== -->
+      <div class="screen" id="s-battle">
+        <canvas id="battle-canvas" width="480" height="700"></canvas>
+        <div class="hud">
+          <div class="hud-hp">
+            <div class="hud-hp-label">HP</div>
+            <div class="hp-hearts" id="battle-hearts"></div>
+          </div>
+          <div class="hud-stage" id="battle-stage-name">
+            SEKOLAH GELAP<span>STAGE 1</span>
+          </div>
+          <div class="hud-score">⭐ <span id="battle-score-val">0</span></div>
+          <div
+            class="combo-bar"
+            id="combo-bar"
+            style="transform: scaleX(0)"
+          ></div>
+        </div>
+        <div class="battle-bars">
+          <div class="bbar-wrap">
+            <div class="bbar-name player" id="player-name">HERO</div>
+            <div class="bbar-outer">
+              <div
+                class="bbar-inner player"
+                id="player-hpbar"
+                style="width: 100%"
+              ></div>
+            </div>
+            <div class="bbar-hp-text player" id="player-hp-text">100 / 100</div>
+          </div>
+          <div
+            style="
+              width: 40px;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              font-family: &quot;Press Start 2P&quot;;
+              font-size: 8px;
+              color: #334;
+              padding-top: 4px;
+            "
+          >
+            VS
+          </div>
+          <div class="bbar-wrap">
+            <div class="bbar-name enemy" id="enemy-name">???</div>
+            <div class="bbar-outer">
+              <div
+                class="bbar-inner enemy"
+                id="enemy-hpbar"
+                style="width: 100%"
+              ></div>
+            </div>
+            <div class="bbar-hp-text enemy" id="enemy-hp-text">100 / 100</div>
+          </div>
+        </div>
+        <div class="battle-feedback" id="battle-feedback"></div>
+        <div class="battle-ui">
+          <div class="question-box">
+            <div class="q-type" id="q-type">PENJUMLAHAN</div>
+            <div class="q-text" id="q-text">5 + 3 = ?</div>
+          </div>
+          <div class="answer-row" id="answer-row"></div>
+          <div class="battle-info-row">
+            <div
+              style="
+                font-family: &quot;Orbitron&quot;, monospace;
+                font-size: 9px;
+                color: #445566;
+              "
+            >
+              ULTI
+            </div>
+            <div class="ulti-bar-wrap">
+              <div class="ulti-bar" id="ulti-bar"></div>
+            </div>
+            <div
+              class="ulti-ready"
+              id="ulti-btn"
+              onclick="G.triggerUlti()"
+              style="display: none"
+            >
+              ⚡ DOMAIN!
+            </div>
+            <div
+              id="ulti-combo"
+              style="
+                font-size: 10px;
+                color: #445566;
+                font-family: &quot;Orbitron&quot;, monospace;
+              "
+            >
+              0/3 combo
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===GAMEOVER=== -->
+      <div class="screen" id="s-gameover">
+        <canvas
+          id="go-canvas"
+          width="480"
+          height="700"
+          style="position: absolute; top: 0; left: 0"
+        ></canvas>
+        <div
+          style="
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+          "
+        >
+          <div class="go-title" id="go-title" style="color: #ff3344">
+            GAME OVER
+          </div>
+          <div style="font-size: 40px" id="go-emoji">💀</div>
+          <div class="go-score">⭐ <span id="go-score">0</span></div>
+          <div class="go-sub" id="go-sub">Kamu gugur di stage 1...</div>
+          <button
+            class="mbtn mbtn-start"
+            style="margin-top: 8px"
+            onclick="G.startGame()"
+          >
+            🔄 MAIN LAGI
+          </button>
+          <button class="mbtn mbtn-info" onclick="G.showScreen('s-menu')">
+            🏠 MENU
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // ================================================================
+      // GAME ENGINE — MATH RPG v2.0
+      // ================================================================
+      const G = (() => {
+        "use strict";
+
+        // ---- STAGES CONFIG ----
+        const STAGES = [
+          {
+            id: 1,
+            name: "SEKOLAH GELAP",
+            color: "#00ccff",
+            bg: "#050818",
+            wallColor: "#0a1428",
+            floorColor: "#070f1e",
+            monsterLight: "#001a2e",
+            desc: "Koridor sepi... cahaya mati...\nmonster bersembunyi di balik kegelapan.",
+            monsters: [
+              {
+                name: "Penyihir Lorong",
+                emoji: "🧙",
+                hp: 100,
+                atk: 20,
+                dmg: 25,
+                moves: ["magic"],
+                speed: 1,
+                aiLv: 1,
+                color: "#aa44ff",
+              },
+              {
+                name: "Prajurit Gelap",
+                emoji: "⚔️",
+                hp: 120,
+                atk: 25,
+                dmg: 25,
+                moves: ["sword"],
+                speed: 1,
+                aiLv: 1,
+                color: "#4488aa",
+              },
+              {
+                name: "Pemanah Bayangan",
+                emoji: "🏹",
+                hp: 80,
+                atk: 30,
+                dmg: 25,
+                moves: ["arrow"],
+                speed: 1,
+                aiLv: 1,
+                color: "#44aa66",
+              },
+            ],
+            monsterCount: 6,
+            fogRadius: 110,
+            mathOps: ["+"],
+            mathRange: [1, 15],
+          },
+          {
+            id: 2,
+            name: "HUTAN TERLARANG",
+            color: "#44ff88",
+            bg: "#020e06",
+            wallColor: "#0a1e0d",
+            floorColor: "#060f08",
+            monsterLight: "#001a0a",
+            desc: "Pohon-pohon raksasa... desir angin gelap...\nbinatang buas mengincar dari kegelapan.",
+            monsters: [
+              {
+                name: "Penyihir Hutan",
+                emoji: "🧙",
+                hp: 200,
+                atk: 35,
+                dmg: 35,
+                moves: ["magic", "teleport"],
+                speed: 1,
+                aiLv: 2,
+                color: "#22aa44",
+              },
+              {
+                name: "Serigala Sihir",
+                emoji: "🐺",
+                hp: 240,
+                atk: 40,
+                dmg: 35,
+                moves: ["bite", "dash"],
+                speed: 2,
+                aiLv: 2,
+                color: "#668866",
+              },
+              {
+                name: "Peri Jahat",
+                emoji: "🧚",
+                hp: 160,
+                atk: 45,
+                dmg: 35,
+                moves: ["arrow", "teleport"],
+                speed: 2,
+                aiLv: 2,
+                color: "#88ff44",
+              },
+            ],
+            monsterCount: 7,
+            fogRadius: 100,
+            mathOps: ["+", "-"],
+            mathRange: [5, 25],
+          },
+          {
+            id: 3,
+            name: "LUAR ANGKASA",
+            color: "#ff88ff",
+            bg: "#030006",
+            wallColor: "#0d001a",
+            floorColor: "#060008",
+            monsterLight: "#0a001a",
+            desc: "Kegelapan tak bertepi... bintang-bintang asing...\nentitas dari dimensi lain mengintai.",
+            monsters: [
+              {
+                name: "Alien Psionic",
+                emoji: "👾",
+                hp: 400,
+                atk: 50,
+                dmg: 40,
+                moves: ["magic", "teleport"],
+                speed: 2,
+                aiLv: 3,
+                color: "#ff44ff",
+              },
+              {
+                name: "Robot Pembunuh",
+                emoji: "🤖",
+                hp: 480,
+                atk: 55,
+                dmg: 40,
+                moves: ["sword", "dash"],
+                speed: 2,
+                aiLv: 3,
+                color: "#8888ff",
+              },
+              {
+                name: "Bintang Neraka",
+                emoji: "⭐",
+                hp: 360,
+                atk: 60,
+                dmg: 40,
+                moves: ["magic", "arrow"],
+                speed: 1,
+                aiLv: 3,
+                color: "#ffff44",
+              },
+            ],
+            monsterCount: 8,
+            fogRadius: 90,
+            mathOps: ["+", "-", "×"],
+            mathRange: [2, 30],
+          },
+          {
+            id: 4,
+            name: "NERAKA",
+            color: "#ff4400",
+            bg: "#0a0000",
+            wallColor: "#1a0500",
+            floorColor: "#0d0200",
+            monsterLight: "#200500",
+            desc: "Lautan api... jeritan abadi...\njendral setan menguasai kegelapan ini.",
+            monsters: [
+              {
+                name: "Iblis Api",
+                emoji: "😈",
+                hp: 800,
+                atk: 70,
+                dmg: 50,
+                moves: ["magic", "teleport", "dash"],
+                speed: 2,
+                aiLv: 4,
+                color: "#ff2200",
+              },
+              {
+                name: "Setan Pedang",
+                emoji: "👹",
+                hp: 960,
+                atk: 80,
+                dmg: 50,
+                moves: ["sword", "dash"],
+                speed: 3,
+                aiLv: 4,
+                color: "#ff6600",
+              },
+              {
+                name: "Malaikat Jatuh",
+                emoji: "👿",
+                hp: 720,
+                atk: 90,
+                dmg: 50,
+                moves: ["arrow", "teleport"],
+                speed: 2,
+                aiLv: 4,
+                color: "#ff4488",
+              },
+            ],
+            monsterCount: 8,
+            fogRadius: 80,
+            mathOps: ["+", "-", "×"],
+            mathRange: [5, 40],
+          },
+          {
+            id: 5,
+            name: "KEDALAMAN LAUTAN",
+            color: "#0088ff",
+            bg: "#000a14",
+            wallColor: "#00111e",
+            floorColor: "#000810",
+            monsterLight: "#001122",
+            desc: "Tekanan gelap menghimpit...\nmakhluk purba bangkit dari palung terdalam.",
+            monsters: [
+              {
+                name: "Kraken Sihir",
+                emoji: "🦑",
+                hp: 1600,
+                atk: 100,
+                dmg: 60,
+                moves: ["magic", "teleport", "dash"],
+                speed: 3,
+                aiLv: 5,
+                color: "#0066ff",
+              },
+              {
+                name: "Naga Laut",
+                emoji: "🐉",
+                hp: 1920,
+                atk: 110,
+                dmg: 60,
+                moves: ["sword", "dash"],
+                speed: 3,
+                aiLv: 5,
+                color: "#00aaff",
+              },
+              {
+                name: "Dewa Ikan",
+                emoji: "🐋",
+                hp: 1440,
+                atk: 120,
+                dmg: 60,
+                moves: ["arrow", "teleport"],
+                speed: 2,
+                aiLv: 5,
+                color: "#44ddff",
+              },
+            ],
+            monsterCount: 9,
+            fogRadius: 75,
+            mathOps: ["-", "×"],
+            mathRange: [3, 50],
+          },
+          {
+            id: 6,
+            name: "LAHAR ABADI",
+            color: "#ff6600",
+            bg: "#080100",
+            wallColor: "#1a0800",
+            floorColor: "#0c0400",
+            monsterLight: "#1a0a00",
+            desc: "Ujung dunia... lahar mengalir tanpa henti...\nraja iblis menunggu di puncak kegelapan.",
+            monsters: [
+              {
+                name: "Raja Iblis",
+                emoji: "💀",
+                hp: 3200,
+                atk: 140,
+                dmg: 80,
+                moves: ["magic", "teleport", "dash"],
+                speed: 3,
+                aiLv: 6,
+                color: "#ff4400",
+              },
+              {
+                name: "Golem Lahar",
+                emoji: "🔥",
+                hp: 3840,
+                atk: 150,
+                dmg: 80,
+                moves: ["sword", "dash"],
+                speed: 2,
+                aiLv: 6,
+                color: "#ff8800",
+              },
+              {
+                name: "Phoenix Kegelapan",
+                emoji: "🦅",
+                hp: 2880,
+                atk: 160,
+                dmg: 80,
+                moves: ["magic", "arrow", "teleport"],
+                speed: 4,
+                aiLv: 6,
+                color: "#ffcc00",
+              },
+            ],
+            monsterCount: 10,
+            fogRadius: 70,
+            mathOps: ["×", "-"],
+            mathRange: [4, 60],
+          },
+        ];
+
+        // ---- STATE ----
+        let state = {};
+        let mapCtx, battleCtx, menuCtx, transCtx, goCtx;
+        let animFrame, moveInterval, battleAnim;
+        let particles = [],
+          projectiles = [],
+          effectQueue = [];
+
+        function initState() {
+          state = {
+            screen: "s-menu",
+            stageIdx: 0,
+            hp: 5,
+            maxHp: 5,
+            score: 0,
+            combo: 0,
+            ultiReady: false,
+            // map
+            map: [],
+            mapW: 25,
+            mapH: 25,
+            tileSize: 32,
+            player: { x: 1, y: 1, px: 0, py: 0, moving: false },
+            monsters: [],
+            monstersKilled: 0,
+            totalMonstersThisStage: 0,
+            // battle
+            inBattle: false,
+            currentMonster: null,
+            playerBattleHp: 100,
+            playerBattleMaxHp: 100,
+            enemyHp: 0,
+            enemyMaxHp: 0,
+            correctAnswer: 0,
+            // battle anim
+            playerX: 100,
+            playerY: 420,
+            enemyX: 360,
+            enemyY: 280,
+            // particles/fx
+            particles: [],
+            projectiles: [],
+            domainActive: false,
+            frameCount: 0,
+            moveDx: 0,
+            moveDy: 0,
+          };
+        }
+
+        // ---- MAZE GENERATION ----
+        function generateMaze(w, h) {
+          const grid = Array.from({ length: h }, () => Array(w).fill(1));
+          function carve(x, y) {
+            const dirs = [
+              [2, 0],
+              [-2, 0],
+              [0, 2],
+              [0, -2],
+            ].sort(() => Math.random() - 0.5);
+            for (const [dx, dy] of dirs) {
+              const nx = x + dx,
+                ny = y + dy;
+              if (
+                nx > 0 &&
+                ny > 0 &&
+                nx < w - 1 &&
+                ny < h - 1 &&
+                grid[ny][nx] === 1
+              ) {
+                grid[y + dy / 2][x + dx / 2] = 0;
+                grid[ny][nx] = 0;
+                carve(nx, ny);
+              }
+            }
+          }
+          grid[1][1] = 0;
+          carve(1, 1);
+          return grid;
+        }
+
+        function getOpenTiles() {
+          const tiles = [];
+          for (let y = 0; y < state.mapH; y++)
+            for (let x = 0; x < state.mapW; x++)
+              if (state.map[y][x] === 0) tiles.push({ x, y });
+          return tiles;
+        }
+
+        function getRandomOpenTile(minDist = 3) {
+          const tiles = getOpenTiles().filter(
+            (t) =>
+              Math.abs(t.x - state.player.x) > minDist ||
+              Math.abs(t.y - state.player.y) > minDist,
+          );
+          return (
+            tiles[Math.floor(Math.random() * tiles.length)] || { x: 3, y: 3 }
+          );
+        }
+
+        function spawnMonsters() {
+          const stage = STAGES[state.stageIdx];
+          state.monsters = [];
+          for (let i = 0; i < stage.monsterCount; i++) {
+            const mDef = stage.monsters[i % stage.monsters.length];
+            const tile = getRandomOpenTile(5);
+            state.monsters.push({
+              ...mDef,
+              hp: mDef.hp,
+              maxHp: mDef.hp,
+              x: tile.x,
+              y: tile.y,
+              px: tile.x * state.tileSize,
+              py: tile.y * state.tileSize,
+              id: i,
+              alive: true,
+              aiTimer: 0,
+              aiState: "idle",
+              fleeTimer: 0,
+            });
+          }
+          state.totalMonstersThisStage = stage.monsterCount;
+          state.monstersKilled = 0;
+        }
+
+        // ---- SCREEN MANAGEMENT ----
+        function showScreen(id) {
+          document
+            .querySelectorAll(".screen")
+            .forEach((s) => s.classList.remove("active"));
+          document.getElementById(id).classList.add("active");
+          state.screen = id;
+        }
+
+        function startGame() {
+          initState();
+          showStageTransition(0);
+        }
+
+        function showStageTransition(idx) {
+          const stage = STAGES[idx];
+          state.stageIdx = idx;
+          document.getElementById("trans-stage-num").textContent =
+            `STAGE ${stage.id}`;
+          document.getElementById("trans-title").textContent = stage.name;
+          document.getElementById("trans-title").style.color = stage.color;
+          document.getElementById("trans-desc").textContent = stage.desc;
+          document.getElementById("trans-enemies").textContent = stage.monsters
+            .map((m) => m.emoji)
+            .join(" ");
+          const btn = document.getElementById("trans-btn");
+          btn.style.color = stage.color;
+          btn.style.borderColor = stage.color;
+          showScreen("s-transition");
+          animateTransition(stage);
+        }
+
+        function animateTransition(stage) {
+          const c = document.getElementById("trans-canvas");
+          const ctx = c.getContext("2d");
+          let t = 0;
+          function loop() {
+            ctx.clearRect(0, 0, 480, 700);
+            ctx.fillStyle = stage.bg;
+            ctx.fillRect(0, 0, 480, 700);
+            // floating particles
+            for (let i = 0; i < 30; i++) {
+              const ang = (t * 0.02 + i * 0.21) * Math.PI * 2;
+              const r = 80 + i * 8;
+              const x = 240 + Math.cos(ang + i) * r * 0.4;
+              const y = 350 + Math.sin(ang + i * 0.7) * r * 0.3;
+              const a = 0.3 + 0.3 * Math.sin(t * 0.05 + i);
+              ctx.beginPath();
+              ctx.arc(x, y, 2 + Math.sin(t * 0.03 + i) * 1.5, 0, Math.PI * 2);
+              ctx.fillStyle =
+                stage.color +
+                Math.floor(a * 255)
+                  .toString(16)
+                  .padStart(2, "0");
+              ctx.fill();
+            }
+            t++;
+            if (state.screen === "s-transition") requestAnimationFrame(loop);
+          }
+          loop();
+        }
+
+        function enterStage() {
+          const stage = STAGES[state.stageIdx];
+          state.map = generateMaze(state.mapW, state.mapH);
+          state.player = {
+            x: 1,
+            y: 1,
+            px: state.tileSize,
+            py: state.tileSize,
+            moving: false,
+          };
+          state.playerBattleHp = state.playerBattleMaxHp;
+          state.combo = 0;
+          state.ultiReady = false;
+          spawnMonsters();
+          updateHUD();
+          showScreen("s-map");
+          startMapLoop();
+        }
+
+        // ---- MAP RENDERING ----
+        function startMapLoop() {
+          if (animFrame) cancelAnimationFrame(animFrame);
+          const c = document.getElementById("map-canvas");
+          mapCtx = c.getContext("2d");
+          function loop() {
+            updateMapPhysics();
+            checkMonsterProximity();
+            updateMapAI();
+            renderMap();
+            animFrame = requestAnimationFrame(loop);
+          }
+          loop();
+        }
+
+        function updateMapPhysics() {
+          const p = state.player;
+          const ts = state.tileSize;
+          const targetPx = p.x * ts,
+            targetPy = p.y * ts;
+          p.px += (targetPx - p.px) * 0.2;
+          p.py += (targetPy - p.py) * 0.2;
+          // monsters smooth move
+          for (const m of state.monsters) {
+            if (!m.alive) continue;
+            m.px += (m.x * ts - m.px) * 0.15;
+            m.py += (m.y * ts - m.py) * 0.15;
+          }
+        }
+
+        function updateMapAI() {
+          const stage = STAGES[state.stageIdx];
+          for (const m of state.monsters) {
+            if (!m.alive) continue;
+            m.aiTimer++;
+            if (m.aiTimer < 60) continue;
+            m.aiTimer = 0;
+            const px = state.player.x,
+              py = state.player.y;
+            const dx = px - m.x,
+              dy = py - m.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            const aiLv = m.aiLv;
+            // AI behavior based on level
+            if (aiLv >= 3 && dist < 8) {
+              // flee behavior
+              const hasTeleport = m.moves.includes("teleport");
+              const hasDash = m.moves.includes("dash");
+              if (hasTeleport && Math.random() < 0.35) {
+                const tile = getRandomOpenTile(8);
+                m.x = tile.x;
+                m.y = tile.y;
+                spawnParticleAt(m.px, m.py, "#ff00ff", "teleport");
+              } else if (hasDash && Math.random() < 0.4) {
+                const awayX = m.x - (dx > 0 ? 1 : -1) * 2;
+                const awayY = m.y - (dy > 0 ? 1 : -1) * 2;
+                const clampedX = Math.max(1, Math.min(state.mapW - 2, awayX));
+                const clampedY = Math.max(1, Math.min(state.mapH - 2, awayY));
+                if (state.map[clampedY][clampedX] === 0) {
+                  m.x = clampedX;
+                  m.y = clampedY;
+                }
+                spawnParticleAt(m.px, m.py, "#ffaa00", "dash");
+              }
+            }
+          }
+        }
+
+        function spawnParticleAt(x, y, color, type) {
+          for (let i = 0; i < 12; i++) {
+            particles.push({
+              x,
+              y,
+              vx: (Math.random() - 0.5) * 4,
+              vy: (Math.random() - 0.5) * 4,
+              life: 1,
+              decay: 0.05,
+              color,
+              size: 3 + Math.random() * 3,
+              type,
+            });
+          }
+        }
+
+        function checkMonsterProximity() {
+          for (const m of state.monsters) {
+            if (!m.alive) continue;
+            if (m.x === state.player.x && m.y === state.player.y) {
+              triggerBattle(m);
+              return;
+            }
+            const d =
+              Math.abs(m.x - state.player.x) + Math.abs(m.y - state.player.y);
+            if (d === 1) {
+              // adjacent — flash
+              const fl = document.getElementById("enc-flash");
+              fl.style.opacity = "0.4";
+              setTimeout(() => (fl.style.opacity = "0"), 300);
+              triggerBattle(m);
+              return;
+            }
+          }
+        }
+
+        function renderMap() {
+          const ctx = mapCtx;
+          const stage = STAGES[state.stageIdx];
+          const ts = state.tileSize;
+          const W = 480,
+            H = 700;
+          ctx.fillStyle = "#000";
+          ctx.fillRect(0, 0, W, H);
+
+          const camX = state.player.px + ts / 2 - W / 2;
+          const camY = state.player.py + ts / 2 - H / 2;
+
+          // draw tiles
+          const startTx = Math.floor(camX / ts) - 1;
+          const startTy = Math.floor(camY / ts) - 1;
+          for (let ty = startTy; ty < startTy + H / ts + 2; ty++) {
+            for (let tx = startTx; tx < startTx + W / ts + 2; tx++) {
+              if (ty < 0 || ty >= state.mapH || tx < 0 || tx >= state.mapW)
+                continue;
+              const sx = tx * ts - camX,
+                sy = ty * ts - camY;
+              if (state.map[ty][tx] === 1) {
+                ctx.fillStyle = stage.wallColor;
+                ctx.fillRect(sx, sy, ts, ts);
+                ctx.strokeStyle = "#ffffff08";
+                ctx.strokeRect(sx, sy, ts, ts);
+              } else {
+                ctx.fillStyle = stage.floorColor;
+                ctx.fillRect(sx, sy, ts, ts);
+                // subtle grid
+                ctx.strokeStyle = "#ffffff05";
+                ctx.strokeRect(sx, sy, ts, ts);
+              }
+            }
+          }
+
+          // draw monsters
+          ctx.font = `${ts - 4}px serif`;
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          for (const m of state.monsters) {
+            if (!m.alive) continue;
+            const sx = m.px - camX + ts / 2,
+              sy = m.py - camY + ts / 2;
+            // glow
+            const grad = ctx.createRadialGradient(sx, sy, 0, sx, sy, ts);
+            grad.addColorStop(0, m.color + "44");
+            grad.addColorStop(1, "transparent");
+            ctx.fillStyle = grad;
+            ctx.beginPath();
+            ctx.arc(sx, sy, ts, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = "#fff";
+            ctx.fillText(m.emoji, sx, sy);
+          }
+
+          // draw particles
+          for (let i = particles.length - 1; i >= 0; i--) {
+            const p = particles[i];
+            p.x += p.vx;
+            p.y += p.vy;
+            p.life -= p.decay;
+            if (p.life <= 0) {
+              particles.splice(i, 1);
+              continue;
+            }
+            ctx.globalAlpha = p.life;
+            ctx.beginPath();
+            ctx.arc(
+              p.x - camX + ts / 2,
+              p.y - camY + ts / 2,
+              p.size,
+              0,
+              Math.PI * 2,
+            );
+            ctx.fillStyle = p.color;
+            ctx.fill();
+            ctx.globalAlpha = 1;
+          }
+
+          // draw player (blue glow)
+          const px = state.player.px - camX + ts / 2;
+          const py = state.player.py - camY + ts / 2;
+          // blue aura
+          const pGrad = ctx.createRadialGradient(px, py, 0, px, py, ts * 1.5);
+          pGrad.addColorStop(0, "#00ccff55");
+          pGrad.addColorStop(0.5, "#0044ff22");
+          pGrad.addColorStop(1, "transparent");
+          ctx.fillStyle = pGrad;
+          ctx.beginPath();
+          ctx.arc(px, py, ts * 1.5, 0, Math.PI * 2);
+          ctx.fill();
+          // player char
+          ctx.font = `${ts}px serif`;
+          ctx.fillText("🧑", px, py);
+          // blue ring
+          ctx.strokeStyle = "#00ccff66";
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.arc(px, py, ts * 0.6, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.lineWidth = 1;
+
+          // FOG OF WAR
+          const fogR = STAGES[state.stageIdx].fogRadius;
+          const fogGrad = ctx.createRadialGradient(
+            px,
+            py,
+            fogR * 0.6,
+            px,
+            py,
+            fogR * 1.3,
+          );
+          fogGrad.addColorStop(0, "transparent");
+          fogGrad.addColorStop(0.4, "rgba(0,0,0,0.5)");
+          fogGrad.addColorStop(1, "rgba(0,0,0,0.97)");
+          ctx.fillStyle = fogGrad;
+          ctx.fillRect(0, 0, W, H);
+
+          // light flicker
+          ctx.globalAlpha = 0.03 * Math.sin(Date.now() * 0.003);
+          ctx.fillStyle = "#00ccff";
+          ctx.beginPath();
+          ctx.arc(px, py, fogR * 0.5, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.globalAlpha = 1;
+
+          // enemies remaining
+          const alive = state.monsters.filter((m) => m.alive).length;
+          ctx.font = "bold 12px Rajdhani";
+          ctx.fillStyle = stage.color + "cc";
+          ctx.textAlign = "left";
+          ctx.fillText(`👹 ${alive} musuh tersisa`, 12, H - 20);
+          if (alive === 0) {
+            ctx.fillStyle = stage.color;
+            ctx.textAlign = "center";
+            ctx.font = "bold 14px Orbitron,monospace";
+            ctx.fillText("SEMUA MUSUH KALAH! STAGE SELESAI!", W / 2, H / 2);
+            setTimeout(() => {
+              if (state.stageIdx < STAGES.length - 1) {
+                showStageTransition(state.stageIdx + 1);
+              } else {
+                showVictory();
+              }
+            }, 2000);
+          }
+        }
+
+        // ---- MOVEMENT ----
+        function movePlayer(dx, dy) {
+          const nx = state.player.x + dx,
+            ny = state.player.y + dy;
+          if (nx < 0 || ny < 0 || nx >= state.mapW || ny >= state.mapH) return;
+          if (state.map[ny][nx] === 1) return;
+          state.player.x = nx;
+          state.player.y = ny;
+        }
+
+        let moveIntervalId = null;
+        function startMove(dx, dy) {
+          movePlayer(dx, dy);
+          stopMove();
+          moveIntervalId = setInterval(() => movePlayer(dx, dy), 180);
+        }
+        function stopMove() {
+          clearInterval(moveIntervalId);
+        }
+
+        // keyboard
+        document.addEventListener("keydown", (e) => {
+          if (state.screen !== "s-map") return;
+          const map = {
+            ArrowUp: [0, -1],
+            ArrowDown: [0, 1],
+            ArrowLeft: [-1, 0],
+            ArrowRight: [1, 0],
+            w: [0, -1],
+            s: [0, 1],
+            a: [-1, 0],
+            d: [1, 0],
+            W: [0, -1],
+            S: [0, 1],
+            A: [-1, 0],
+            D: [1, 0],
+          };
+          if (map[e.key]) {
+            e.preventDefault();
+            movePlayer(...map[e.key]);
+          }
+        });
+
+        // ---- BATTLE ----
+        let battleAnimId = null;
+        let bParticles = [],
+          bProjectiles = [];
+        let bState = {
+          playerX: 100,
+          playerY: 380,
+          enemyX: 360,
+          enemyY: 250,
+          playerAnim: "idle",
+          enemyAnim: "idle",
+          playerAnimT: 0,
+          enemyAnimT: 0,
+          shake: 0,
+          enemyShake: 0,
+          domainRing: 0,
+          domainActive: false,
+          bgPulse: 0,
+        };
+
+        function triggerBattle(monster) {
+          if (state.inBattle) return;
+          state.inBattle = true;
+          state.currentMonster = monster;
+          state.enemyHp = monster.hp;
+          state.enemyMaxHp = monster.hp;
+          state.combo = 0;
+          state.ultiReady = false;
+          updateBattleUI();
+          newQuestion();
+          showScreen("s-battle");
+          bParticles = [];
+          bProjectiles = [];
+          bState = {
+            playerX: 100,
+            playerY: 380,
+            enemyX: 360,
+            enemyY: 250,
+            playerAnim: "idle",
+            enemyAnim: "idle",
+            playerAnimT: 0,
+            enemyAnimT: 0,
+            shake: 0,
+            enemyShake: 0,
+            domainRing: 0,
+            domainActive: false,
+            bgPulse: 0,
+          };
+          startBattleLoop();
+        }
+
+        function startBattleLoop() {
+          if (battleAnimId) cancelAnimationFrame(battleAnimId);
+          const c = document.getElementById("battle-canvas");
+          battleCtx = c.getContext("2d");
+          function loop() {
+            renderBattle();
+            battleAnimId = requestAnimationFrame(loop);
+          }
+          loop();
+        }
+
+        function renderBattle() {
+          const ctx = battleCtx;
+          const stage = STAGES[state.stageIdx];
+          const W = 480,
+            H = 700;
+          ctx.clearRect(0, 0, W, H);
+
+          // BG
+          ctx.fillStyle = stage.bg;
+          ctx.fillRect(0, 0, W, H);
+
+          // bg particles (ambient)
+          state.frameCount = (state.frameCount || 0) + 1;
+          if (state.frameCount % 3 === 0) {
+            bParticles.push({
+              x: Math.random() * W,
+              y: H + 10,
+              vx: (Math.random() - 0.5) * 0.5,
+              vy: -(0.5 + Math.random()),
+              life: 1,
+              decay: 0.005,
+              color: stage.color,
+              size: 1 + Math.random() * 2,
+              type: "ambient",
+            });
+          }
+
+          // domain effect
+          if (bState.domainActive) {
+            bState.domainRing += 3;
+            if (bState.domainRing > 300) {
+              bState.domainActive = false;
+              bState.domainRing = 0;
+            }
+            ctx.strokeStyle = "#00ccff";
+            ctx.lineWidth = 3;
+            ctx.globalAlpha = 1 - bState.domainRing / 300;
+            ctx.beginPath();
+            ctx.arc(W / 2, H / 2, bState.domainRing, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.arc(W / 2, H / 2, bState.domainRing * 0.6, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.globalAlpha = 1;
+            ctx.lineWidth = 1;
+            // domain overlay
+            const dGrad = ctx.createRadialGradient(
+              W / 2,
+              H / 2,
+              0,
+              W / 2,
+              H / 2,
+              300,
+            );
+            dGrad.addColorStop(0, "#0044ff11");
+            dGrad.addColorStop(0.5, "#00ccff08");
+            dGrad.addColorStop(1, "transparent");
+            ctx.fillStyle = dGrad;
+            ctx.fillRect(0, 0, W, H);
+          }
+
+          // bg shake
+          if (bState.shake > 0) {
+            ctx.translate(
+              Math.sin(bState.shake * 0.5) * (bState.shake * 0.3),
+              0,
+            );
+            bState.shake *= 0.8;
+          }
+          if (bState.enemyShake > 0) {
+          } // handled per draw
+
+          // draw floor line
+          ctx.strokeStyle = "#ffffff0a";
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.moveTo(0, 480);
+          ctx.lineTo(W, 480);
+          ctx.stroke();
+
+          // ENEMY
+          const m = state.currentMonster;
+          if (m) {
+            const ex =
+              bState.enemyX +
+              (bState.enemyShake > 0
+                ? Math.sin(Date.now() * 0.05) * bState.enemyShake
+                : 0);
+            const ey = bState.enemyY;
+            // enemy glow
+            const eGrad = ctx.createRadialGradient(ex, ey, 0, ex, ey, 80);
+            eGrad.addColorStop(0, m.color + "55");
+            eGrad.addColorStop(1, "transparent");
+            ctx.fillStyle = eGrad;
+            ctx.beginPath();
+            ctx.arc(ex, ey, 80, 0, Math.PI * 2);
+            ctx.fill();
+            // enemy sprite big
+            ctx.font = "80px serif";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            const enemyBob = Math.sin(Date.now() * 0.002) * 6;
+            ctx.fillText(m.emoji, ex, ey + enemyBob);
+            if (bState.enemyShake > 0) bState.enemyShake *= 0.85;
+
+            // enemy elemental aura based on moves
+            if (m.moves.includes("magic")) {
+              for (let i = 0; i < 6; i++) {
+                const ang = Date.now() * 0.002 + (i * Math.PI) / 3;
+                const rx = ex + Math.cos(ang) * 55,
+                  ry = ey + Math.sin(ang) * 30;
+                ctx.beginPath();
+                ctx.arc(rx, ry, 5, 0, Math.PI * 2);
+                ctx.fillStyle = m.color + "88";
+                ctx.fill();
+              }
+            }
+            if (m.moves.includes("sword")) {
+              ctx.strokeStyle = m.color + "66";
+              ctx.lineWidth = 2;
+              ctx.beginPath();
+              ctx.moveTo(ex - 30, ey - 40);
+              ctx.lineTo(ex + 10, ey - 60);
+              ctx.stroke();
+              ctx.lineWidth = 1;
+            }
+            if (m.moves.includes("arrow")) {
+              ctx.fillStyle = m.color + "88";
+              ctx.fillRect(ex + 30, ey - 10, 20, 3);
+              ctx.beginPath();
+              ctx.moveTo(ex + 50, ey - 10 + 1.5);
+              ctx.lineTo(ex + 44, ey - 14);
+              ctx.lineTo(ex + 44, ey + 3);
+              ctx.fill();
+            }
+          }
+
+          // PLAYER
+          const px = bState.playerX;
+          const py = bState.playerY;
+          // blue aura
+          const pGrad = ctx.createRadialGradient(px, py, 0, px, py, 70);
+          pGrad.addColorStop(0, "#00ccff44");
+          pGrad.addColorStop(0.5, "#0044ff22");
+          pGrad.addColorStop(1, "transparent");
+          ctx.fillStyle = pGrad;
+          ctx.beginPath();
+          ctx.arc(px, py, 70, 0, Math.PI * 2);
+          ctx.fill();
+          // player sprite
+          ctx.font = "64px serif";
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          const playerBob = Math.sin(Date.now() * 0.003) * 4;
+          ctx.fillText("🧑", px, py + playerBob);
+          // blue ring orbit
+          for (let i = 0; i < 3; i++) {
+            const ang = Date.now() * 0.003 + (i * Math.PI * 2) / 3;
+            const rx = px + Math.cos(ang) * 45,
+              ry = py + Math.sin(ang) * 25;
+            ctx.beginPath();
+            ctx.arc(rx, ry, 5, 0, Math.PI * 2);
+            const ringGrad = ctx.createRadialGradient(rx, ry, 0, rx, ry, 5);
+            ringGrad.addColorStop(0, "#00ccff");
+            ringGrad.addColorStop(1, "#0044ff00");
+            ctx.fillStyle = ringGrad;
+            ctx.fill();
+          }
+          // blue energy ring
+          ctx.strokeStyle = "#00ccff33";
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.arc(
+            px,
+            py,
+            50 + Math.sin(Date.now() * 0.004) * 5,
+            0,
+            Math.PI * 2,
+          );
+          ctx.stroke();
+          ctx.lineWidth = 1;
+
+          // PROJECTILES
+          for (let i = bProjectiles.length - 1; i >= 0; i--) {
+            const p = bProjectiles[i];
+            p.x += p.vx;
+            p.y += p.vy;
+            p.life -= p.decay;
+            if (p.life <= 0) {
+              bProjectiles.splice(i, 1);
+              continue;
+            }
+            ctx.globalAlpha = p.life;
+            if (p.type === "blue_ball") {
+              const bg = ctx.createRadialGradient(
+                p.x,
+                p.y,
+                0,
+                p.x,
+                p.y,
+                p.size,
+              );
+              bg.addColorStop(0, "#ffffff");
+              bg.addColorStop(0.4, "#00ccff");
+              bg.addColorStop(1, "transparent");
+              ctx.fillStyle = bg;
+              ctx.beginPath();
+              ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+              ctx.fill();
+              // trail
+              ctx.beginPath();
+              ctx.arc(
+                p.x - p.vx * 2,
+                p.y - p.vy * 2,
+                p.size * 0.5,
+                0,
+                Math.PI * 2,
+              );
+              ctx.fillStyle = "#0066ff88";
+              ctx.fill();
+            } else if (p.type === "punch") {
+              ctx.fillStyle = "#00ccff";
+              ctx.font = `${Math.floor(p.size)}px serif`;
+              ctx.textAlign = "center";
+              ctx.fillText("👊", p.x, p.y);
+            } else if (p.type === "enemy_magic") {
+              const mg = ctx.createRadialGradient(
+                p.x,
+                p.y,
+                0,
+                p.x,
+                p.y,
+                p.size,
+              );
+              mg.addColorStop(0, "#ffffff");
+              mg.addColorStop(0.4, m ? m.color : "#ff4400");
+              mg.addColorStop(1, "transparent");
+              ctx.fillStyle = mg;
+              ctx.beginPath();
+              ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+              ctx.fill();
+            } else if (p.type === "ulti_ball") {
+              ctx.strokeStyle = "#00ccff";
+              ctx.lineWidth = 2;
+              ctx.beginPath();
+              ctx.arc(p.x, p.y, p.size * 1.5, 0, Math.PI * 2);
+              ctx.stroke();
+              const ug = ctx.createRadialGradient(
+                p.x,
+                p.y,
+                0,
+                p.x,
+                p.y,
+                p.size,
+              );
+              ug.addColorStop(0, "#ffffff");
+              ug.addColorStop(0.3, "#00ccff");
+              ug.addColorStop(0.7, "#0044ff");
+              ug.addColorStop(1, "transparent");
+              ctx.fillStyle = ug;
+              ctx.beginPath();
+              ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+              ctx.fill();
+            }
+            ctx.globalAlpha = 1;
+          }
+
+          // BATTLE PARTICLES
+          for (let i = bParticles.length - 1; i >= 0; i--) {
+            const p = bParticles[i];
+            p.x += p.vx;
+            p.y += p.vy;
+            p.life -= p.decay;
+            if (p.life <= 0) {
+              bParticles.splice(i, 1);
+              continue;
+            }
+            ctx.globalAlpha = p.life * 0.6;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+            ctx.fillStyle = p.color;
+            ctx.fill();
+            ctx.globalAlpha = 1;
+          }
+
+          ctx.setTransform(1, 0, 0, 1, 0, 0);
+        }
+
+        function newQuestion() {
+          const stage = STAGES[state.stageIdx];
+          const ops = stage.mathOps;
+          const op = ops[Math.floor(Math.random() * ops.length)];
+          const [lo, hi] = stage.mathRange;
+          let a, b, ans;
+          if (op === "+") {
+            a = lo + Math.floor(Math.random() * (hi - lo));
+            b = lo + Math.floor(Math.random() * (hi - lo));
+            ans = a + b;
+          } else if (op === "-") {
+            b = lo + Math.floor(Math.random() * (hi - lo));
+            a = b + lo + Math.floor(Math.random() * (hi - lo));
+            ans = a - b;
+          } else {
+            a = 2 + Math.floor(Math.random() * 9);
+            b = 2 + Math.floor(Math.random() * 9);
+            ans = a * b;
+          }
+          const typeMap = {
+            "+": "PENJUMLAHAN",
+            "-": "PENGURANGAN",
+            "×": "PERKALIAN",
+          };
+          document.getElementById("q-type").textContent = typeMap[op];
+          document.getElementById("q-text").textContent = `${a} ${op} ${b} = ?`;
+          state.correctAnswer = ans;
+          buildAnswerButtons(ans);
+        }
+
+        function buildAnswerButtons(correct) {
+          const row = document.getElementById("answer-row");
+          row.innerHTML = "";
+          const wrongs = new Set();
+          while (wrongs.size < 2) {
+            let w = correct + (Math.floor(Math.random() * 8) - 4);
+            if (w !== correct && w >= 0) wrongs.add(w);
+          }
+          const choices = [correct, ...wrongs].sort(() => Math.random() - 0.5);
+          choices.forEach((v) => {
+            const btn = document.createElement("button");
+            btn.className = "abtn";
+            btn.textContent = v;
+            btn.onclick = () => submitAnswer(v, btn);
+            row.appendChild(btn);
+          });
+        }
+
+        function submitAnswer(val, btn) {
+          document.querySelectorAll(".abtn").forEach((b) => (b.onclick = null));
+          const stage = STAGES[state.stageIdx];
+          const dmgPerHit = 25 * (1 + state.stageIdx * 0.3);
+
+          if (val === state.correctAnswer) {
+            btn.classList.add("correct");
+            // blue punch projectile
+            bProjectiles.push({
+              x: bState.playerX + 30,
+              y: bState.playerY,
+              vx: 8,
+              vy: -4,
+              size: 16,
+              life: 1,
+              decay: 0.06,
+              type: "blue_ball",
+            });
+            // particles burst from player
+            for (let i = 0; i < 15; i++) {
+              bParticles.push({
+                x: bState.playerX,
+                y: bState.playerY,
+                vx: (Math.random() - 0.5) * 5,
+                vy: -Math.random() * 4,
+                life: 1,
+                decay: 0.04,
+                color: "#00ccff",
+                size: 3 + Math.random() * 4,
+                type: "hit",
+              });
+            }
+            state.enemyHp = Math.max(0, state.enemyHp - dmgPerHit);
+            bState.enemyShake = 8;
+            state.combo++;
+            const ultiPct = Math.min(100, (state.combo / 3) * 100);
+            document.getElementById("ulti-bar").style.width = ultiPct + "%";
+            document.getElementById("ulti-combo").textContent =
+              `${Math.min(state.combo, 3)}/3 combo`;
+            if (state.combo >= 3) {
+              state.ultiReady = true;
+              document.getElementById("ulti-btn").style.display = "block";
+              document.getElementById("ulti-combo").textContent = "ULTI SIAP!";
+            }
+            showFeedback("+" + Math.round(dmgPerHit) + " DMG!", "bf-correct");
+            if (state.enemyHp <= 0) {
+              setTimeout(() => endBattle(true), 800);
+            } else {
+              setTimeout(() => {
+                newQuestion();
+                enableAnswerButtons();
+              }, 900);
+            }
+          } else {
+            btn.classList.add("wrong");
+            const enemyAtk =
+              state.currentMonster.atk * (1 + state.stageIdx * 0.5);
+            state.playerBattleHp = Math.max(0, state.playerBattleHp - enemyAtk);
+            bState.shake = 10;
+            // enemy attacks back
+            const etype = state.currentMonster.moves[0];
+            bProjectiles.push({
+              x: bState.enemyX - 30,
+              y: bState.enemyY,
+              vx: -7,
+              vy: 3,
+              size: 14,
+              life: 1,
+              decay: 0.06,
+              type: "enemy_magic",
+            });
+            for (let i = 0; i < 10; i++) {
+              bParticles.push({
+                x: bState.playerX,
+                y: bState.playerY,
+                vx: (Math.random() - 0.5) * 6,
+                vy: (Math.random() - 0.5) * 4,
+                life: 1,
+                decay: 0.05,
+                color: "#ff3344",
+                size: 3 + Math.random() * 3,
+                type: "damage",
+              });
+            }
+            state.combo = 0;
+            document.getElementById("ulti-bar").style.width = "0%";
+            document.getElementById("ulti-btn").style.display = "none";
+            document.getElementById("ulti-combo").textContent = "0/3 combo";
+            state.ultiReady = false;
+            showFeedback("-" + Math.round(enemyAtk) + " HP!", "bf-wrong");
+            updateBattleUI();
+            if (state.playerBattleHp <= 0) {
+              state.hp--;
+              updateHUD();
+              if (state.hp <= 0) {
+                setTimeout(() => showGameOver(), 800);
+                return;
+              }
+              state.playerBattleHp = state.playerBattleMaxHp;
+            }
+            setTimeout(() => {
+              newQuestion();
+              enableAnswerButtons();
+            }, 900);
+          }
+          updateBattleUI();
+        }
+
+        function enableAnswerButtons() {
+          document.querySelectorAll(".abtn").forEach((b) => {
+            b.classList.remove("correct", "wrong");
+            b.onclick = () => submitAnswer(parseInt(b.textContent), b);
+          });
+        }
+
+        function showFeedback(text, cls) {
+          const fb = document.getElementById("battle-feedback");
+          fb.textContent = text;
+          fb.className = "battle-feedback " + cls;
+          fb.style.opacity = "1";
+          setTimeout(() => (fb.style.opacity = "0"), 700);
+        }
+
+        function triggerUlti() {
+          if (!state.ultiReady) return;
+          state.ultiReady = false;
+          state.combo = 0;
+          document.getElementById("ulti-btn").style.display = "none";
+          document.getElementById("ulti-bar").style.width = "0%";
+          document.getElementById("ulti-combo").textContent = "0/3 combo";
+          // domain expansion
+          bState.domainActive = true;
+          bState.domainRing = 0;
+          // big blue ball
+          const dmg = 25 * (1 + state.stageIdx * 0.3) * 3;
+          for (let i = 0; i < 5; i++) {
+            setTimeout(() => {
+              bProjectiles.push({
+                x: bState.playerX + 30,
+                y: bState.playerY,
+                vx: 6 + i,
+                vy: -3 + i * 0.5,
+                size: 22,
+                life: 1,
+                decay: 0.04,
+                type: "ulti_ball",
+              });
+            }, i * 120);
+          }
+          for (let i = 0; i < 30; i++) {
+            bParticles.push({
+              x: bState.playerX,
+              y: bState.playerY,
+              vx: (Math.random() - 0.5) * 8,
+              vy: -Math.random() * 6,
+              life: 1,
+              decay: 0.02,
+              color: i % 2 === 0 ? "#00ccff" : "#ffffff",
+              size: 4 + Math.random() * 5,
+              type: "ulti",
+            });
+          }
+          showFeedback("⚡ DOMAIN CAHAYA! ×3!", "bf-ulti");
+          setTimeout(() => {
+            state.enemyHp = Math.max(0, state.enemyHp - dmg);
+            bState.enemyShake = 15;
+            updateBattleUI();
+            if (state.enemyHp <= 0) setTimeout(() => endBattle(true), 800);
+            else {
+              newQuestion();
+              enableAnswerButtons();
+            }
+          }, 800);
+        }
+
+        function updateBattleUI() {
+          const stage = STAGES[state.stageIdx];
+          document.getElementById("battle-stage-name").textContent = stage.name;
+          document.getElementById("battle-stage-name").innerHTML =
+            `${stage.name}<span>STAGE ${stage.id}</span>`;
+          document.getElementById("battle-score-val").textContent = state.score;
+          // HP bars
+          const pPct = Math.max(
+            0,
+            (state.playerBattleHp / state.playerBattleMaxHp) * 100,
+          );
+          const ePct = Math.max(0, (state.enemyHp / state.enemyMaxHp) * 100);
+          document.getElementById("player-hpbar").style.width = pPct + "%";
+          document.getElementById("enemy-hpbar").style.width = ePct + "%";
+          document.getElementById("player-hp-text").textContent =
+            `${Math.round(state.playerBattleHp)}/${state.playerBattleMaxHp}`;
+          document.getElementById("enemy-hp-text").textContent =
+            `${Math.round(state.enemyHp)}/${state.enemyMaxHp}`;
+          document.getElementById("enemy-name").textContent =
+            state.currentMonster ? state.currentMonster.name : "???";
+          updateHUD();
+        }
+
+        function endBattle(won) {
+          if (battleAnimId) {
+            cancelAnimationFrame(battleAnimId);
+            battleAnimId = null;
+          }
+          state.inBattle = false;
+          if (won) {
+            state.currentMonster.alive = false;
+            state.monstersKilled++;
+            state.score += 100 * (state.stageIdx + 1);
+            const alive = state.monsters.filter((m) => m.alive).length;
+            document.getElementById("hud-kills-val").textContent =
+              alive + " musuh";
+            showScreen("s-map");
+            startMapLoop();
+          }
+        }
+
+        function showGameOver() {
+          if (battleAnimId) {
+            cancelAnimationFrame(battleAnimId);
+            battleAnimId = null;
+          }
+          if (animFrame) {
+            cancelAnimationFrame(animFrame);
+            animFrame = null;
+          }
+          const stage = STAGES[state.stageIdx];
+          document.getElementById("go-title").textContent = "GAME OVER";
+          document.getElementById("go-title").style.color = "#ff3344";
+          document.getElementById("go-emoji").textContent = "💀";
+          document.getElementById("go-score").textContent = state.score;
+          document.getElementById("go-sub").textContent =
+            `Gugur di ${stage.name}...`;
+          showScreen("s-gameover");
+          animateGameOver("#ff2200");
+        }
+
+        function showVictory() {
+          if (battleAnimId) {
+            cancelAnimationFrame(battleAnimId);
+            battleAnimId = null;
+          }
+          if (animFrame) {
+            cancelAnimationFrame(animFrame);
+            animFrame = null;
+          }
+          document.getElementById("go-title").textContent = "🏆 KEMENANGAN!";
+          document.getElementById("go-title").style.color = "#ffd700";
+          document.getElementById("go-emoji").textContent = "🌟";
+          document.getElementById("go-score").textContent = state.score;
+          document.getElementById("go-sub").textContent =
+            "Kamu menaklukkan semua 6 stage!";
+          showScreen("s-gameover");
+          animateGameOver("#ffd700");
+        }
+
+        function animateGameOver(color) {
+          const c = document.getElementById("go-canvas");
+          const ctx = c.getContext("2d");
+          let t = 0;
+          const pts = Array.from({ length: 50 }, () => ({
+            x: Math.random() * 480,
+            y: Math.random() * 700,
+            vx: (Math.random() - 0.5) * 2,
+            vy: -0.5 - Math.random(),
+            size: 2 + Math.random() * 4,
+            life: Math.random(),
+          }));
+          function loop() {
+            ctx.fillStyle = "rgba(0,0,0,0.15)";
+            ctx.fillRect(0, 0, 480, 700);
+            for (const p of pts) {
+              p.x += p.vx;
+              p.y += p.vy;
+              p.life -= 0.005;
+              if (p.life <= 0 || p.y < 0) {
+                p.y = 750;
+                p.x = Math.random() * 480;
+                p.life = 1;
+              }
+              ctx.globalAlpha = p.life * 0.6;
+              ctx.beginPath();
+              ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+              ctx.fillStyle = color;
+              ctx.fill();
+            }
+            ctx.globalAlpha = 1;
+            t++;
+            if (state.screen === "s-gameover") requestAnimationFrame(loop);
+          }
+          loop();
+        }
+
+        function updateHUD() {
+          const stage = STAGES[state.stageIdx] || STAGES[0];
+          // hearts
+          const hStr = Array.from(
+            { length: 5 },
+            (_, i) =>
+              `<div class="heart${i < state.hp ? "" : " empty"}"></div>`,
+          ).join("");
+          document.getElementById("hud-hearts").innerHTML = hStr;
+          document.getElementById("battle-hearts").innerHTML = hStr;
+          document.getElementById("hud-stage-name").innerHTML =
+            `${stage.name}<span>STAGE ${stage.id}</span>`;
+          document.getElementById("hud-score-val").textContent = state.score;
+        }
+
+        // ---- MENU ANIMATION ----
+        function animateMenu() {
+          const c = document.getElementById("menu-canvas");
+          const ctx = c.getContext("2d");
+          const pts = Array.from({ length: 80 }, () => ({
+            x: Math.random() * 480,
+            y: Math.random() * 700,
+            vx: (Math.random() - 0.5) * 0.4,
+            vy: -0.2 - Math.random() * 0.6,
+            size: 1 + Math.random() * 2.5,
+            life: Math.random(),
+            color: Math.random() > 0.5 ? "#00ccff" : "#4466ff",
+          }));
+          function loop() {
+            ctx.fillStyle = "rgba(0,0,0,0.05)";
+            ctx.fillRect(0, 0, 480, 700);
+            for (const p of pts) {
+              p.x += p.vx;
+              p.y += p.vy;
+              p.life -= 0.003;
+              if (p.life <= 0 || p.y < 0) {
+                p.y = 710;
+                p.x = Math.random() * 480;
+                p.life = 1;
+              }
+              ctx.globalAlpha = p.life * 0.7;
+              ctx.beginPath();
+              ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+              ctx.fillStyle = p.color;
+              ctx.fill();
+            }
+            ctx.globalAlpha = 1;
+            if (state.screen === "s-menu") requestAnimationFrame(loop);
+            else requestAnimationFrame(loop); // keep running always for menu returns
+          }
+          loop();
+
+          // player preview
+          const pc = document.getElementById("player-preview-canvas");
+          const pctx = pc.getContext("2d");
+          function previewLoop() {
+            pctx.clearRect(0, 0, 80, 80);
+            const t = Date.now() * 0.003;
+            // glow
+            const g = pctx.createRadialGradient(40, 40, 0, 40, 40, 35);
+            g.addColorStop(0, "#00ccff44");
+            g.addColorStop(1, "transparent");
+            pctx.fillStyle = g;
+            pctx.beginPath();
+            pctx.arc(40, 40, 35, 0, Math.PI * 2);
+            pctx.fill();
+            // orbit
+            for (let i = 0; i < 3; i++) {
+              const a = t + (i * Math.PI * 2) / 3;
+              pctx.beginPath();
+              pctx.arc(
+                40 + Math.cos(a) * 28,
+                40 + Math.sin(a) * 16,
+                4,
+                0,
+                Math.PI * 2,
+              );
+              const rg = pctx.createRadialGradient(
+                40 + Math.cos(a) * 28,
+                40 + Math.sin(a) * 16,
+                0,
+                40 + Math.cos(a) * 28,
+                40 + Math.sin(a) * 16,
+                4,
+              );
+              rg.addColorStop(0, "#00ccff");
+              rg.addColorStop(1, "transparent");
+              pctx.fillStyle = rg;
+              pctx.fill();
+            }
+            pctx.font = `${32 + Math.sin(t) * 2}px serif`;
+            pctx.textAlign = "center";
+            pctx.textBaseline = "middle";
+            pctx.fillText("🧑", 40, 40 + Math.sin(t) * 3);
+            requestAnimationFrame(previewLoop);
+          }
+          previewLoop();
+        }
+
+        // ---- INIT ----
+        initState();
+        animateMenu();
+
+        return {
+          showScreen,
+          startGame,
+          enterStage,
+          startMove,
+          stopMove,
+          triggerUlti,
+        };
+      })();
+    </script>
+  </body>
+</html>
